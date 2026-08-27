@@ -24,6 +24,7 @@ import type {
 import { SPLITTER, usePane } from '../lib/panes'
 import Splitter from './Splitter'
 import Sidebar from './Sidebar'
+import Gallery from './Gallery'
 import PreviewStage, { type StageTheme } from './PreviewStage'
 import ComposeStage from './ComposeStage'
 import ThemePanel from './ThemePanel'
@@ -34,9 +35,10 @@ import CodePanel, { COMPONENT_VIEWS, PAGE_VIEWS } from './CodePanel'
 import EventLog from './EventLog'
 import styles from './App.module.css'
 
-type Mode = 'component' | 'compose'
+type Mode = 'gallery' | 'component' | 'compose'
 
 const MODES: { id: Mode; label: string; hint: string }[] = [
+  { id: 'gallery', label: 'Gallery', hint: 'Every component as a tile' },
   { id: 'component', label: 'Component', hint: 'One component, every prop' },
   {
     id: 'compose',
@@ -66,7 +68,11 @@ export default function App() {
   const fromUrl = readUrl()
   const fromComposeUrl = readComposeUrl()
 
-  const [mode, setMode] = useState<Mode>(fromComposeUrl ? 'compose' : 'component')
+  // A deep link (component hash or compose hash) opens straight to that view;
+  // a bare load lands on the gallery — the browse-all overview.
+  const [mode, setMode] = useState<Mode>(
+    fromComposeUrl ? 'compose' : fromUrl ? 'component' : 'gallery',
+  )
 
   const [selected, setSelected] = useState(() => {
     const named = fromUrl && manifests.some((entry) => entry.name === fromUrl.name)
@@ -152,7 +158,16 @@ export default function App() {
   // over the hash.
   useEffect(() => {
     if (mode === 'compose') writeComposeUrl(composition, theme)
-    else if (manifest && values) writeUrl(manifest, values)
+    else if (mode === 'component' && manifest && values) writeUrl(manifest, values)
+    else if (mode === 'gallery' && window.location.hash) {
+      // The gallery isn't a single component, so it owns no hash — and clearing
+      // a stale one means a reload returns to the gallery, not the last component.
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search,
+      )
+    }
   }, [mode, composition, theme, manifest, values])
 
   // Adopt a hash pasted into an already-open playground. Without this the
@@ -236,6 +251,15 @@ export default function App() {
       if (current === -1) return delta === 1 ? pool[0] : pool[pool.length - 1]
       return pool[(current + delta + pool.length) % pool.length]
     })
+  }
+
+  /** Open a component from the gallery into its see-it-and-edit-it detail view. */
+  function openComponent(name: string) {
+    setInteractive(false)
+    setMode('component')
+    setSelected(name)
+    // On the phone the detail opens straight to the preview, not the list tab.
+    setMobileTab('view')
   }
 
   /* ---------------- editing ---------------- */
@@ -370,6 +394,16 @@ export default function App() {
   const commands = useMemo<Command[]>(
     () => [
       {
+        id: 'mode-gallery',
+        group: 'Go',
+        label: 'Gallery',
+        hint: 'all components',
+        run: () => {
+          setInteractive(false)
+          setMode('gallery')
+        },
+      },
+      {
         id: 'mode-component',
         group: 'Go',
         label: 'Component mode',
@@ -476,7 +510,7 @@ export default function App() {
   // Tabs replace the side-by-side panes on a narrow screen. Interact mode is the
   // page alone, so it keeps no tabs. The list tab only exists in Component mode,
   // so a stale 'list' falls back to the preview in Compose.
-  const tabbed = isMobile && !bare
+  const tabbed = isMobile && !bare && mode !== 'gallery'
   const activeTab: MobileTab = composing && mobileTab === 'list' ? 'view' : mobileTab
   const hidden = (tab: MobileTab) => (tabbed && activeTab !== tab ? styles.paneHidden : '')
 
@@ -529,6 +563,8 @@ export default function App() {
               {composition.blocks.length === 1 ? '' : 's'} on the page, one shared
               theme.
             </>
+          ) : mode === 'gallery' ? (
+            <>Every component, at a glance. Click one to open it.</>
           ) : (
             <>
               Manifest-driven. Drop a folder in <code>src/components/</code> to add
@@ -538,7 +574,9 @@ export default function App() {
         </p>
       </header>
 
-      {manifest && values ? (
+      {mode === 'gallery' && manifests.length > 0 ? (
+        <Gallery manifests={manifests} onOpen={openComponent} />
+      ) : manifest && values ? (
         <div
           className={styles.layout}
           style={{ gridTemplateColumns: columns }}

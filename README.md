@@ -1,8 +1,10 @@
 # Component Playground
 
+**▶ Live demo: [bjdealey.github.io/component-playground](https://bjdealey.github.io/component-playground/)** — 92 example components, no install.
+
 A local, self-hosted playground for your own React components. Browse them in a
-sidebar, tweak their props through a live controls panel, watch the preview
-update in real time, and copy the exact JSX for your current settings.
+gallery or sidebar, tweak their props through a live controls panel, watch the
+preview update in real time, and copy the exact JSX for your current settings.
 
 Then switch to **[Compose](#compose-a-page-of-components)** and see a dozen of
 them together on a page, reacting to each other, under one shared theme that
