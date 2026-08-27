@@ -1,0 +1,28 @@
+.plain {
+  border: 0 solid transparent;
+  max-width: 100%;
+}
+
+.vertical {
+  border: 0 solid transparent;
+  align-self: stretch;
+}
+
+.labelled {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+.rule {
+  flex: 1;
+  border: 0 solid transparent;
+  min-width: 8px;
+}
+
+.label {
+  flex-shrink: 0;
+  line-height: 1;
+  white-space: nowrap;
+}

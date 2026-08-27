@@ -1,0 +1,34 @@
+.alert {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+}
+
+/* Positions the slotted badge; the badge styles itself. */
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.body {
+  line-height: 1.5;
+  opacity: 0.88;
+}
+

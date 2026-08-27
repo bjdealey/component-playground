@@ -1,0 +1,54 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+  max-width: 100%;
+}
+
+.field {
+  position: relative;
+  display: block;
+}
+
+.select {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  border-style: solid;
+  border-color: var(--select-border);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.select:focus {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Triangle drawn with borders — no asset, no dependency. */
+.chevron {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-top: -2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top-style: solid;
+  border-top-width: 5px;
+  pointer-events: none;
+}
+
+.helper {
+  font-size: 12px;
+  line-height: 1.4;
+}

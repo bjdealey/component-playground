@@ -1,0 +1,41 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+  border-style: solid;
+  border-color: var(--field-border);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.field:focus-within {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.disabled {
+  opacity: 0.55;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.input::placeholder {
+  color: #9aa1ab;
+}

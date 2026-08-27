@@ -1,0 +1,47 @@
+/* Containing block for the absolutely-positioned centre readout. */
+.gauge {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.svg {
+  display: block;
+}
+
+.fill {
+  transition: stroke-dasharray 0.3s ease;
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.value {
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.suffix {
+  font-size: 0.55em;
+  font-weight: 600;
+  opacity: 0.6;
+  margin-left: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

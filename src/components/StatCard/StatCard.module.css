@@ -1,0 +1,39 @@
+/* Containing block for the corner badge. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+}
+
+.badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.stat,
+.chart {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.chart {
+  align-items: flex-end;
+}

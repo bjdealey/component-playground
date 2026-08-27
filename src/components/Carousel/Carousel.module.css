@@ -1,0 +1,66 @@
+/* Containing block for the arrows and dot rail. */
+.carousel {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Positions the slotted icon buttons; they style themselves. */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    transition: none;
+  }
+}

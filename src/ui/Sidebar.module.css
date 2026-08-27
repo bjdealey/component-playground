@@ -1,0 +1,253 @@
+.sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--panel);
+  overflow-y: auto;
+  padding: 14px 10px;
+}
+
+/* Stacked layout: the list becomes a capped, scrollable strip at the top rather
+   than a full-height column, so the preview and controls sit within reach below. */
+@media (max-width: 899px) {
+  .sidebar {
+    /* A full-height tab now (one region at a time), not a capped strip. */
+    flex: 1;
+    border-right: none;
+  }
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* Containing block for the clear button. */
+.searchRow {
+  position: relative;
+  padding: 0 8px 8px;
+}
+
+.search {
+  width: 100%;
+  height: 28px;
+  padding: 0 24px 0 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 12.5px;
+}
+
+/* Touch: taller filter and nav rows — desktop density is unchanged. */
+@media (pointer: coarse) {
+  .search,
+  .clear {
+    height: 36px;
+  }
+
+  .item {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+}
+
+.search::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.search:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* The "/" affordance, shown in the empty, unfocused field so the shortcut is
+   discoverable without cluttering the row once you're typing. */
+.hint {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel-alt);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.clear {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  width: 22px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clear:hover {
+  color: var(--text);
+}
+
+.noMatch {
+  margin: 0;
+  padding: 4px 10px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+.noMatch code {
+  font-family: var(--mono);
+  color: var(--text-muted);
+}
+
+.expandAll {
+  margin: 0 8px 6px;
+  padding: 3px 6px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.expandAll:hover {
+  background: var(--panel-alt);
+  color: var(--text-muted);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 10px 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sectionHeader:hover .sectionName {
+  color: var(--text);
+}
+
+.chevron {
+  width: 0;
+  height: 0;
+  flex-shrink: 0;
+  border-left: 4px solid var(--text-faint);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  transition: transform 0.12s ease;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.sectionName {
+  flex: 1;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-align: left;
+  transition: color 0.1s ease;
+}
+
+.sectionCount {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.item:hover {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.active,
+.active:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.itemName {
+  font-family: var(--mono);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemMeta {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.active .itemMeta {
+  color: var(--accent);
+}
+
+.uses {
+  display: block;
+  padding: 3px 10px 5px 12px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-faint);
+}

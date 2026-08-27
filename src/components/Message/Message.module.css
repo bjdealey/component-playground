@@ -1,0 +1,53 @@
+.message {
+  display: flex;
+  align-items: flex-end;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.right {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.right .stack {
+  align-items: flex-end;
+}
+
+/* Containing block for the tail. */
+.bubble {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* A CSS triangle, so the tail needs no asset. */
+.tail {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-bottom-width: 0;
+}
+
+.meta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}

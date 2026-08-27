@@ -1,0 +1,34 @@
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: inherit;
+  line-height: 1.3;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.crumb {
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--breadcrumb-background);
+  color: var(--breadcrumb-color);
+}
+
+/* `role="button"` lands on a crumb exactly when there is somewhere to go, so it
+   is also the right condition for the highlight — the current page and the
+   collapsed "…" stand for nothing and stay inert.
+   `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.crumb[role='button']:hover,
+.crumb[role='button'][data-hover] {
+  background-color: var(--breadcrumb-hover-background, var(--breadcrumb-background));
+  color: var(--breadcrumb-hover-color, var(--breadcrumb-color));
+  filter: brightness(var(--breadcrumb-hover-brightness, 1));
+}
+
+.separator {
+  user-select: none;
+  line-height: 1;
+}

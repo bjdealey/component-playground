@@ -1,0 +1,38 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  font-family: inherit;
+  text-align: left;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  border-bottom-style: solid;
+}
+
+.stacked {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.key {
+  flex-shrink: 0;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.value {
+  margin: 0;
+  min-width: 0;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.95em;
+}

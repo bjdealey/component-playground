@@ -1,0 +1,7 @@
+.list {
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+}

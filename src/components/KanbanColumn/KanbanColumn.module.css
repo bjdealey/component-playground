@@ -1,0 +1,29 @@
+.column {
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1;
+}
+
+.add {
+  display: inline-flex;
+  margin-left: auto;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+}

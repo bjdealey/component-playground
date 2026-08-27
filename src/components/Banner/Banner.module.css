@@ -1,0 +1,25 @@
+.banner {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* Each slot is positioned here; the slotted component styles itself. */
+.icon,
+.action {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.message {
+  min-width: 0;
+}
+
+.action {
+  margin-left: auto;
+}

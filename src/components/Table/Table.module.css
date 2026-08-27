@@ -1,0 +1,48 @@
+.frame {
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.table th,
+.table td {
+  border-style: solid;
+  border-width: 0;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* The first body row sits directly under the header's own bottom border. */
+.table tbody tr:first-child td {
+  border-top-width: 0;
+}
+
+/*
+ * Every body row, striped or not, gets its fill from a custom property rather
+ * than an inline style — an inline `background-color` would outrank the :hover
+ * rule below and the hovered row would keep its resting fill.
+ */
+.table tbody tr {
+  background-color: var(--table-background);
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.clickableRow:hover,
+.clickableRow[data-hover] {
+  background-color: var(--table-hover-background, var(--table-background));
+  filter: brightness(var(--table-hover-brightness, 1));
+}

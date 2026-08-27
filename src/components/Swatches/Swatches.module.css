@@ -1,0 +1,54 @@
+.grid {
+  display: inline-grid;
+  justify-items: center;
+  font-family: inherit;
+}
+
+.item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.swatch {
+  display: block;
+  box-sizing: border-box;
+  border-style: solid;
+  transition: box-shadow 0.12s ease, transform 0.12s ease;
+}
+
+/*
+ * A lift rather than a tint: the swatch's fill is the thing being previewed, so
+ * anything that recoloured it on hover would be showing a colour the user did
+ * not pick. `[data-hover]` is the pinned state — same rule, so the two can't
+ * drift.
+ */
+.item:hover .swatch,
+.item[data-hover] .swatch {
+  transform: scale(var(--swatches-hover-scale, 1));
+}
+
+.label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swatch {
+    transition: none;
+  }
+  /* Motion is the entire effect here, so it goes rather than merely slowing
+     down — `hoverScale` is deliberately ignored. The pinned selector is listed
+     too, or inspecting the state would show a lift the pointer never produces. */
+  .item:hover .swatch,
+  .item[data-hover] .swatch {
+    transform: none;
+  }
+}

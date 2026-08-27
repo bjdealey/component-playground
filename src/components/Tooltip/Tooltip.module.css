@@ -1,0 +1,31 @@
+/* The bubble is absolutely positioned, so this wrapper must be its containing
+   block — otherwise it anchors to the document and drags layout with it. */
+.wrapper {
+  position: relative;
+  display: inline-block;
+  font-family: inherit;
+}
+
+.target {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px dashed #cbd2da;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 1;
+  width: max-content;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.arrow {
+  position: absolute;
+  z-index: -1;
+}

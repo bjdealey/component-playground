@@ -1,0 +1,63 @@
+.summary {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.average {
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The slotted Rating styles itself. */
+.rating {
+  display: inline-flex;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  flex-shrink: 0;
+  min-width: 3ch;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* flex-basis: 0 overrides Progress's own `width`, so it fills the gap. */
+.bar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.bar > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.count {
+  flex-shrink: 0;
+  min-width: 4ch;
+  text-align: right;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}

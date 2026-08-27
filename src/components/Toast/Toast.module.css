@@ -1,0 +1,56 @@
+/* Containing block for the corner-anchored toast. */
+.frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-style: solid;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.toast {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  text-align: left;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.16);
+}
+
+/* Positions the slotted badge; the badge styles itself. */
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Positions the slotted button; the button styles itself. */
+.action {
+  flex-shrink: 0;
+  align-self: center;
+  display: inline-flex;
+}
+
+
+.hint {
+  font-size: 12.5px;
+}
+
+.hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-27",
+  "title": "Design System: Component Playground",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Workbench Indigo",
+        "canonical": "#4f46e5",
+        "tonalRamp": ["#1e1b4b", "#312e81", "#3730a3", "#4338ca", "#4f46e5", "#6366f1", "#a5b4fc", "#eef2ff"]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Indigo Wash",
+        "canonical": "#eef2ff",
+        "tonalRamp": ["#312e81", "#3730a3", "#4338ca", "#4f46e5", "#6366f1", "#a5b4fc", "#c7d2fe", "#eef2ff"]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#17191c",
+        "tonalRamp": ["#17191c", "#2b2f36", "#454b54", "#6b7280", "#9aa1ab", "#d3d8de", "#e3e6ea", "#f6f7f9"]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#6b7280",
+        "tonalRamp": ["#17191c", "#2b2f36", "#454b54", "#6b7280", "#9aa1ab", "#d3d8de", "#e3e6ea", "#f6f7f9"]
+      },
+      "text-faint": {
+        "role": "neutral",
+        "displayName": "Faint Slate",
+        "canonical": "#6b7280",
+        "tonalRamp": ["#17191c", "#2b2f36", "#454b54", "#6b7280", "#9aa1ab", "#d3d8de", "#e3e6ea", "#f6f7f9"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e3e6ea",
+        "tonalRamp": ["#17191c", "#2b2f36", "#454b54", "#6b7280", "#9aa1ab", "#d3d8de", "#e3e6ea", "#f6f7f9"]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "#f6f7f9",
+        "tonalRamp": ["#17191c", "#2b2f36", "#454b54", "#6b7280", "#9aa1ab", "#d3d8de", "#e3e6ea", "#f6f7f9"]
+      },
+      "danger": {
+        "role": "status",
+        "displayName": "Danger Red",
+        "canonical": "#dc2626",
+        "tonalRamp": ["#450a0a", "#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#fca5a5", "#fee2e2"]
+      },
+      "danger-soft": { "role": "status", "displayName": "Danger Soft", "canonical": "#f1b4b4" },
+      "danger-muted": { "role": "status", "displayName": "Danger Muted", "canonical": "#9a6a6a" },
+      "success": { "role": "status", "displayName": "Success Green", "canonical": "#15803d" },
+      "warn": { "role": "status", "displayName": "Warning Amber", "canonical": "#b45309" },
+      "warn-soft": { "role": "status", "displayName": "Warning Amber Wash", "canonical": "#fef3c7" },
+      "accent-soft-hover": { "role": "primary", "displayName": "Indigo Wash Hover", "canonical": "#e6ebfe" },
+      "switch-off": { "role": "neutral", "displayName": "Switch Off", "canonical": "#cbd2da" },
+      "scrim": { "role": "neutral", "displayName": "Scrim", "canonical": "rgba(15, 23, 42, 0.32)" }
+    },
+    "typographyMeta": {
+      "heading": { "displayName": "Heading", "purpose": "The largest text in the app — empty-state titles only. There is no hero." },
+      "title": { "displayName": "Title", "purpose": "App title and panel titles; the ceiling for everyday chrome." },
+      "label": { "displayName": "Label / Eyebrow", "purpose": "Uppercase, tracked, faint section eyebrows in the sidebar and controls panel." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, notes, and help text at a generous line-height." },
+      "mono": { "displayName": "Mono / Identifier", "purpose": "Component names, prop keys, live values, event expressions, generated code." }
+    },
+    "shadows": [
+      { "name": "seated", "value": "0 1px 2px rgba(15,23,42,0.08)", "purpose": "Active mode-switch segment and small raised buttons — barely off the surface." },
+      { "name": "dropdown", "value": "0 2px 8px rgba(15,23,42,0.14)", "purpose": "Menus and popovers opening over content." },
+      { "name": "floating-card", "value": "0 1px 3px rgba(15,23,42,0.1), 0 8px 28px rgba(15,23,42,0.07)", "purpose": "A lifted panel; two layers for a soft ambient cast." },
+      { "name": "dialog", "value": "0 16px 48px rgba(15,23,42,0.24)", "purpose": "Modal dialogs, decisively above everything else." },
+      { "name": "switch-knob", "value": "0 1px 2px rgba(15,23,42,0.3)", "purpose": "The toggle handle, so it reads as a real object riding its track." },
+      { "name": "focus-ring", "value": "0 0 0 3px #eef2ff", "purpose": "The accent-soft halo around a focused field, paired with an accent border." }
+    ],
+    "motion": [
+      { "name": "transition-state", "value": "background-color 0.1s ease, color 0.1s ease", "purpose": "The default hover/active state change on buttons, items, and controls." },
+      { "name": "transition-chevron", "value": "transform 0.12s ease", "purpose": "Disclosure-triangle rotation on open/close." },
+      { "name": "transition-switch", "value": "0.15s ease", "purpose": "Toggle track color and knob translation." },
+      { "name": "overlay-entrance", "value": "0.18s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The Add-block dialog and command menu settle in — rise and scale from 0.985 — while the scrim fades over 0.15s. Reduced motion keeps the fade only." },
+      { "name": "undo-rise", "value": "0.2s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The undo toast rises into place after a removal; reduced motion fades it instead." },
+      { "name": "reach-count", "value": "~280ms ease-out (requestAnimationFrame)", "purpose": "The reach readout's counts roll to their new figure when a toggle changes the theme's reach; reduced motion snaps." }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The default outline button — the tool has almost no filled buttons.",
+      "html": "<button class='ds-btn-secondary'>Reset</button>",
+      "css": ".ds-btn-secondary { padding: 5px 10px; border: 1px solid #d3d8de; border-radius: 6px; background: #ffffff; color: #6b7280; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; cursor: pointer; transition: background-color 0.1s ease, color 0.1s ease; } .ds-btn-secondary:hover { background: #fbfbfc; color: #17191c; } .ds-btn-secondary:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The outlined field with the system's signature accent-soft focus ring.",
+      "html": "<input class='ds-input' type='text' value='Primary' />",
+      "css": ".ds-input { width: 220px; height: 32px; padding: 0 9px; border: 1px solid #d3d8de; border-radius: 6px; background: #ffffff; color: #17191c; font-size: 12.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-input:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 3px #eef2ff; }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "custom",
+      "description": "A pill track with a shadowed knob, built on a visually-hidden real checkbox (shown checked).",
+      "html": "<label class='ds-switch'><input class='ds-switch-input' type='checkbox' checked /><span class='ds-switch-track'><span class='ds-switch-knob'></span></span></label>",
+      "css": ".ds-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; } .ds-switch-input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; } .ds-switch-track { display: block; width: 40px; height: 23px; border-radius: 999px; background: #cbd2da; transition: background-color 0.15s ease; } .ds-switch-knob { display: block; width: 17px; height: 17px; margin: 3px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 2px rgba(15,23,42,0.3); transition: transform 0.15s ease; } .ds-switch-input:checked + .ds-switch-track { background: #4f46e5; } .ds-switch-input:checked + .ds-switch-track .ds-switch-knob { transform: translateX(17px); } .ds-switch-input:focus-visible + .ds-switch-track { outline: 2px solid #4f46e5; outline-offset: 2px; }"
+    },
+    {
+      "name": "Sidebar Nav Item (active)",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "The accent-soft selection idiom — the tool's universal 'this is selected' language.",
+      "html": "<button class='ds-nav-item ds-nav-item-active'><span class='ds-nav-name'>Button</span><span class='ds-nav-meta'>12</span></button>",
+      "css": ".ds-nav-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 200px; padding: 8px 10px; border: none; border-radius: 6px; background: transparent; color: #6b7280; text-align: left; cursor: pointer; transition: background-color 0.1s ease, color 0.1s ease; } .ds-nav-item:hover { background: #fbfbfc; color: #17191c; } .ds-nav-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; } .ds-nav-meta { font-size: 11px; color: #6b7280; font-variant-numeric: tabular-nums; } .ds-nav-item-active, .ds-nav-item-active:hover { background: #eef2ff; color: #4f46e5; font-weight: 600; } .ds-nav-item-active .ds-nav-meta { color: #4f46e5; }"
+    },
+    {
+      "name": "Mode Switch (segmented)",
+      "kind": "custom",
+      "refersTo": "mode-segment-active",
+      "description": "The header's Component/Compose toggle; the active segment lifts on a seated shadow.",
+      "html": "<div class='ds-modes'><button class='ds-mode ds-mode-active'>Component</button><button class='ds-mode'>Compose</button></div>",
+      "css": ".ds-modes { display: inline-flex; gap: 2px; padding: 2px; background: #fbfbfc; border: 1px solid #e3e6ea; border-radius: 7px; } .ds-mode { padding: 4px 13px; border: none; border-radius: 5px; background: transparent; color: #6b7280; font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; cursor: pointer; transition: background-color 0.1s ease, color 0.1s ease; } .ds-mode:hover { color: #17191c; } .ds-mode-active, .ds-mode-active:hover { background: #ffffff; color: #17191c; font-weight: 500; box-shadow: 0 1px 2px rgba(15,23,42,0.08); }"
+    },
+    {
+      "name": "Color Field",
+      "kind": "input",
+      "description": "A swatch beside a mono hex field; unset colors read as dashed and dimmed.",
+      "html": "<div class='ds-color'><button class='ds-swatch' style='background:#4f46e5'></button><input class='ds-hex' type='text' value='#4f46e5' /></div>",
+      "css": ".ds-color { display: inline-grid; grid-template-columns: 40px 160px; align-items: center; gap: 10px; } .ds-swatch { width: 40px; height: 32px; padding: 2px; border: 1px solid #d3d8de; border-radius: 6px; cursor: pointer; } .ds-hex { width: 100%; height: 32px; padding: 0 9px; border: 1px solid #d3d8de; border-radius: 6px; background: #ffffff; color: #17191c; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; } .ds-hex:focus { border-color: #4f46e5; outline: none; box-shadow: 0 0 0 3px #eef2ff; }"
+    },
+    {
+      "name": "Command menu",
+      "kind": "custom",
+      "description": "The ⌘K palette — a keyboard-first modal that jumps to any component or runs an action, on the same idiom as the Add-block dialog.",
+      "html": "<div class='ds-cmd'><input class='ds-cmd-search' value='kan' readonly /><div class='ds-cmd-list'><div class='ds-cmd-cat'>Components</div><button class='ds-cmd-row ds-cmd-row-active'><span class='ds-cmd-name'>KanbanColumn</span><span class='ds-cmd-hint'>Content</span></button><button class='ds-cmd-row'><span class='ds-cmd-name'>Card</span><span class='ds-cmd-hint'>Data display</span></button></div></div>",
+      "css": ".ds-cmd { width: 320px; border: 1px solid #e3e6ea; border-radius: 12px; background: #ffffff; box-shadow: 0 16px 48px rgba(15,23,42,0.24); overflow: hidden; } .ds-cmd-search { width: 100%; box-sizing: border-box; padding: 9px 12px; border: none; border-bottom: 1px solid #e3e6ea; background: #fbfbfc; font: 13.5px -apple-system, BlinkMacSystemFont, sans-serif; outline: none; } .ds-cmd-list { padding: 6px 8px; } .ds-cmd-cat { padding: 8px; font-weight: 600; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: #6b7280; } .ds-cmd-row { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 7px 10px; border: none; border-radius: 6px; background: transparent; color: #6b7280; cursor: pointer; } .ds-cmd-row-active, .ds-cmd-row:hover { background: #eef2ff; color: #4f46e5; } .ds-cmd-name { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; } .ds-cmd-hint { font-size: 11px; color: #6b7280; } .ds-cmd-row-active .ds-cmd-hint { color: #4f46e5; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Workbench",
+    "overview": "The Component Playground is a workbench, not a showroom. Tools are laid out cleanly along the edges — a sidebar of components, a controls panel, a theme rig, a code readout — and the work itself is clamped in the middle, lit evenly, with nothing around it competing for the eye. The chrome is quiet on purpose: its entire job is to hold whatever component you are examining and get out of its way. Every surface is a neutral gray or white; the one spot of color is a single indigo that marks what is yours — the selected item, the focused field, the active mode. The personality is precise, dense, and unshowy: type is small and half-pixel-tuned, identifiers wear a monospace face because they are code, numbers are tabular, corners are gently rounded, borders are hairline, and depth is almost absent. It reads like a well-kept instrument: calm, legible, and confident enough not to decorate.",
+    "keyCharacteristics": [
+      "Neutral grayscale chrome with a single indigo accent — the preview is the only color that matters.",
+      "Monospace for every identifier (component names, prop names, values, code).",
+      "Flat surfaces divided by hairline borders; shadow reserved for true elevation.",
+      "Compact, half-pixel typography (10.5–14px working range) and tabular numerals.",
+      "Gentle 6px corners, understated motion (0.1s ease for state, a 0.18s decelerate for things that arrive), one universal focus ring."
+    ],
+    "rules": [
+      { "name": "The Neutral Chrome Rule", "body": "The workbench is grayscale plus one indigo. New tool UI introduces no competing color; emphasis uses the indigo or the indigo wash, never a new hue. The previewed components and their themes are the only real color on screen.", "section": "colors" },
+      { "name": "The One Accent Rule", "body": "Indigo marks selection, focus, and the active choice — nothing else. Keep it on well under ~10% of any screen; if everything is accented, nothing is.", "section": "colors" },
+      { "name": "The Status-Isn't-Brand Rule", "body": "Red/green/amber mean success and failure. Never repaint a status color in the brand indigo, and never use the brand indigo to signal an error.", "section": "colors" },
+      { "name": "The Mono Identifier Rule", "body": "If a string is code — a component name, a prop key, a value, a handler expression — it is set in the monospace face. Prose about the code is set in sans. The two faces tell you what is literal.", "section": "typography" },
+      { "name": "The Tabular Count Rule", "body": "Every number that sits in a list or repeats down a column uses font-variant-numeric: tabular-nums, so counts never shift as they change.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Resting surfaces are flat and border-separated. A shadow appears only in response to elevation (a menu, a dialog, a lifted tab) — never to decorate a static panel.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep new chrome grayscale + the single indigo. Reach for accent (emphasis) or accent-soft (selected/active ground) before any new color.",
+      "Do set every identifier — component names, prop keys, values, code — in the monospace face, and everything about them in sans.",
+      "Do mark selection and focus with the established idioms: accent-soft background + accent text for active items, and the 0 0 0 3px accent-soft ring on focused fields.",
+      "Do separate resting surfaces with 1px border lines and the panel/panel-alt/page value steps — reserve shadow for things that truly lift.",
+      "Do use tabular-nums for any count, and keep uppercase eyebrows small (10.5–11px), tracked (+0.07em), and text-faint.",
+      "Do stay dense and compact: 6px workhorse radius, quick 0.1s ease transitions, half-pixel type sizes where the existing scale uses them."
+    ],
+    "donts": [
+      "Don't introduce a second brand hue or paint chrome with the previewed components' theme colors. The chrome is the frame, not the picture.",
+      "Don't use mark-violet (#8b5cf6) anywhere but the logo mark's gradient, and don't repaint status red/green/amber in the accent (or vice versa).",
+      "Don't drop shadows on static panels, or replace the hairline-border separation with elevation.",
+      "Don't enlarge the type into a marketing hierarchy — there is no hero; 16px is the ceiling.",
+      "Don't proliferate breakpoints or fork the IA. The chrome has exactly one width breakpoint (900px: grid to one-at-a-time tabs) plus input-method (pointer: coarse) sizing on top — nothing more. The desktop pane grid is the home; make new chrome work there first, let it become one of the mobile tabs below the breakpoint, and never build a second, different mobile information architecture.",
+      "Don't let the accent spread past selection/focus/active — if it's on more than a sliver of the screen, it has stopped meaning anything."
+    ]
+  }
+}

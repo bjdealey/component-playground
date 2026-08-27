@@ -1,0 +1,55 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.heading {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.link {
+  line-height: 1.5;
+  cursor: pointer;
+  white-space: nowrap;
+  /* Custom property rather than an inline colour, so the :hover rule below can
+     still win. */
+  color: var(--footer-link-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.link:hover,
+.link[data-hover] {
+  color: var(--footer-link-hover-color, var(--footer-link-color));
+  text-decoration: var(--footer-link-hover-decoration, underline);
+}
+
+.base {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}

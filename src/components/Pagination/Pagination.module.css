@@ -1,0 +1,39 @@
+.pagination {
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border-style: solid;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease, filter 0.12s ease;
+  background-color: var(--pagination-background);
+  color: var(--pagination-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.cell:not(:disabled):hover,
+.cell:not(:disabled)[data-hover] {
+  background-color: var(--pagination-hover-background, var(--pagination-background));
+  color: var(--pagination-hover-color, var(--pagination-color));
+  filter: brightness(var(--pagination-hover-brightness, 1));
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  line-height: 1;
+  user-select: none;
+}

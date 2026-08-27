@@ -1,0 +1,54 @@
+/* Containing block for the overlay and dialog — a stand-in viewport. */
+.frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-style: solid;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  text-align: left;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);
+}
+
+/* Positions the slotted icon button; the button styles itself. */
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+  padding-right: 24px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.hint {
+  font-size: 12.5px;
+}
+
+.hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

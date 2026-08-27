@@ -1,0 +1,46 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+  max-width: 100%;
+}
+
+.label {
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.required {
+  margin-left: 2px;
+  color: #dc2626;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  border-style: solid;
+  border-color: var(--input-border);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.input::placeholder {
+  color: #9aa1ab;
+}
+
+/* The focus ring is the border's own hue, just faint. */
+.input:focus {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.helper {
+  line-height: 1.4;
+}

@@ -1,0 +1,13 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  line-height: 1;
+}
+
+/* Carries the overlap and stacking order; the Avatar inside styles itself. */
+.seat {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}

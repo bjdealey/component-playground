@@ -1,0 +1,41 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+}
+
+.bar {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* The highlight sweeps across a wide gradient rather than moving an overlay. */
+.shimmer {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--highlight) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation-name: sweep;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes sweep {
+  from {
+    background-position: -100% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+    background-image: none;
+  }
+}

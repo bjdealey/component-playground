@@ -1,0 +1,92 @@
+.palette {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom-style: solid;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  line-height: 1.3;
+}
+
+.input::placeholder {
+  color: var(--placeholder-color);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 0 10px;
+  border: none;
+  font-family: inherit;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--commandpalette-background);
+  color: var(--commandpalette-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.row:hover,
+.row[data-hover] {
+  background-color: var(--commandpalette-hover-background, var(--commandpalette-background));
+  color: var(--commandpalette-hover-color, var(--commandpalette-color));
+  filter: brightness(var(--commandpalette-hover-brightness, 1));
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Positions the slotted Kbd; the Kbd styles itself. */
+.shortcut {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.footer {
+  border-top-style: solid;
+  line-height: 1.4;
+}

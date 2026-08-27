@@ -1,0 +1,37 @@
+.viewer {
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  text-align: left;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.time {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The slotted Badge sizes itself; fixed width keeps the messages aligned. */
+.level {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 52px;
+}
+
+.message {
+  min-width: 0;
+}

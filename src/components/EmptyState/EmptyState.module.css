@@ -1,0 +1,31 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  text-align: center;
+  font-family: inherit;
+}
+
+/* Positions the slotted badge; the badge styles itself. */
+.glyph {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.body {
+  line-height: 1.55;
+  max-width: 40ch;
+}
+
+/* Positions the slotted button; the button styles itself. */
+.action {
+  display: inline-flex;
+}

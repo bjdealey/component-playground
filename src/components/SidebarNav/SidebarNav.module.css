@@ -1,0 +1,60 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.section {
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1;
+  user-select: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--sidebarnav-background);
+  color: var(--sidebarnav-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.row:hover,
+.row[data-hover] {
+  background-color: var(--sidebarnav-hover-background, var(--sidebarnav-background));
+  color: var(--sidebarnav-hover-color, var(--sidebarnav-color));
+  filter: brightness(var(--sidebarnav-hover-brightness, 1));
+}
+
+.glyph {
+  flex-shrink: 0;
+  width: 1.1em;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The slotted Badge sizes itself; the row only stops it shrinking. */
+.row > span:last-child {
+  flex-shrink: 0;
+}

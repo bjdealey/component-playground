@@ -1,0 +1,73 @@
+.wrapper {
+  display: flex;
+  max-width: 100%;
+  font-family: inherit;
+  gap: 10px;
+}
+
+.row {
+  flex-direction: row;
+  align-items: center;
+}
+
+.column {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.track {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.fill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  transition: width 0.25s ease;
+}
+
+.striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.28) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 255, 255, 0.28) 75%,
+    transparent 75%
+    );
+  background-size: 1rem 1rem;
+}
+
+.animated {
+  animation: slide 1s linear infinite;
+}
+
+@keyframes slide {
+  from {
+    background-position: 1rem 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated {
+    animation: none;
+  }
+  .fill {
+    transition: none;
+  }
+}
+
+.label {
+  flex-shrink: 0;
+  padding: 0 6px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

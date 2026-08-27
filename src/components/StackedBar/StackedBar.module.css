@@ -1,0 +1,74 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.2;
+}
+
+.bar {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+.segment {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  transition: width 0.25s ease;
+}
+
+.legend {
+  display: grid;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item > span:last-child {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segment {
+    transition: none;
+  }
+}
+
+.segment[role='button'] {
+  cursor: pointer;
+}
+
+/* Only segments that respond to a click get hover feedback. */
+.segment[role='button']:hover,
+.segment[role='button'][data-hover] {
+  filter: brightness(var(--stackedbar-hover-brightness, 1));
+}

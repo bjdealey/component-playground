@@ -1,0 +1,56 @@
+.heatmap {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+
+.columns,
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.columnLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  text-align: center;
+}
+
+.rowLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding-right: 4px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.cell {
+  display: block;
+  flex-shrink: 0;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.legendSteps {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cell[role='button'] {
+  cursor: pointer;
+}
+
+/* Only marks that actually respond to a click get hover feedback. */
+.cell[role='button']:hover,
+.cell[role='button'][data-hover] {
+  filter: brightness(var(--heatmap-hover-brightness, 1));
+}

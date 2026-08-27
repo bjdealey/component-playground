@@ -1,0 +1,26 @@
+/* Containing block for the dropped menu. */
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+
+.pair {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Clips the square-cornered children to the pair's outer radius. */
+.seat {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  margin-top: 6px;
+}

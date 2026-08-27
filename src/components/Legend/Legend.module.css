@@ -1,0 +1,55 @@
+.legend {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  line-height: 1.35;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Custom property rather than an inline colour, so the :hover rule below can
+     still win. */
+  color: var(--legend-label-color);
+}
+
+.value {
+  margin-left: auto;
+  padding-left: 10px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.horizontal .value {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+/*
+ * The row is the target, the label carries the effect — the swatch stays put so
+ * the series colour reads true. `[data-hover]` is the pinned state, written in
+ * the same shape so the two can't drift.
+ */
+.interactive:hover .label,
+.interactive[data-hover] .label {
+  color: var(--legend-label-hover-color, var(--legend-label-color));
+  text-decoration: var(--legend-label-hover-decoration, underline);
+}

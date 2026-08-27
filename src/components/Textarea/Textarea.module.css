@@ -1,0 +1,36 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+  max-width: 100%;
+}
+
+.area {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  border-style: solid;
+  border-color: var(--area-border);
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.area::placeholder {
+  color: #9aa1ab;
+}
+
+.area:focus {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.area:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.helper {
+  font-size: 12px;
+  line-height: 1.4;
+}

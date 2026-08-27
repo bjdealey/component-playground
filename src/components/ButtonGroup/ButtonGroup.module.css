@@ -1,0 +1,25 @@
+.group {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+/* Clips the square-cornered Button to the group's outer radius. */
+.seat {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+/*
+ * Not a hover state — a stacking fix, and deliberately outside the hover
+ * contract. Seats overlap by 1px so neighbours share an edge, which means the
+ * next seat's border paints over the one you're pointing at. Raising the hovered
+ * seat puts its own border on top, so Button's hover shows a complete outline.
+ * The visible hover styling belongs to the Button inside; there is nothing here
+ * to recolour, and no `[data-hover]` twin because nothing pins a z-index.
+ */
+.seat:hover {
+  position: relative;
+  z-index: 1;
+}

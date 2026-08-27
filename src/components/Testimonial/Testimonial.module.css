@@ -1,0 +1,42 @@
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+}
+
+.mark {
+  line-height: 0.7;
+  font-weight: 700;
+  font-family: Georgia, 'Times New Roman', serif;
+  height: 0.5em;
+}
+
+/* Positions the slotted rating; the rating styles itself. */
+.rating {
+  display: inline-flex;
+  line-height: 1;
+}
+
+.quote {
+  margin: 0;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.35;
+}

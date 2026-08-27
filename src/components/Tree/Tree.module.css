@@ -1,0 +1,56 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+/* Containing block for the indent guide lines. */
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1;
+  text-align: left;
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--tree-background);
+  color: var(--tree-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.row:hover,
+.row[data-hover] {
+  background-color: var(--tree-hover-background, var(--tree-background));
+  color: var(--tree-hover-color, var(--tree-color));
+  filter: brightness(var(--tree-hover-brightness, 1));
+}
+
+.guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  pointer-events: none;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 1em;
+  text-align: center;
+  opacity: 0.65;
+  line-height: 1;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.95em;
+}

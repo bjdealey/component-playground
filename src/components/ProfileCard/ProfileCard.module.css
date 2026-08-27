@@ -1,0 +1,59 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+}
+
+/* Slots position here; the slotted components style themselves. */
+.avatar,
+.badge,
+.action {
+  display: inline-flex;
+}
+
+.action {
+  align-self: stretch;
+}
+
+.action > * {
+  flex: 1;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.nameRow {
+  display: inline-flex;
+  align-items: center;
+}
+
+.name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.stats {
+  display: flex;
+  align-items: baseline;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.statValue {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}

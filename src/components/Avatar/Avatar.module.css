@@ -1,0 +1,46 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-style: solid;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  user-select: none;
+  overflow: hidden;
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--avatar-background);
+  color: var(--avatar-color);
+}
+
+.status {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+/* Only present once a click handler is, so a static avatar keeps the default
+   cursor. The focus ring is the browser's own — nothing to restyle. */
+.avatar[role='button'] {
+  cursor: pointer;
+}
+
+/* Read from the root — that's the click target and what the pointer is over —
+   but applied to the face, which is the part that carries colour. The status dot
+   is a sibling, so it stays at full strength instead of dimming with the face.
+   `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.avatar[role='button']:hover .face,
+.avatar[role='button'][data-hover] .face {
+  background-color: var(--avatar-hover-background, var(--avatar-background));
+  color: var(--avatar-hover-color, var(--avatar-color));
+  filter: brightness(var(--avatar-hover-brightness, 1));
+}

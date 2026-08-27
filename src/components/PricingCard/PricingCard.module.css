@@ -1,0 +1,68 @@
+/* Containing block for the badge, which sits on the top edge. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+}
+
+/* Positions whatever is slotted in; the badge styles itself. */
+.badge {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  transform: translateY(-50%);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.plan {
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.price {
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lets a slotted button stretch to the card without the card styling it. */
+.cta {
+  display: flex;
+}
+
+.cta > * {
+  flex: 1;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.check {
+  flex-shrink: 0;
+  font-weight: 700;
+  line-height: 1.45;
+}

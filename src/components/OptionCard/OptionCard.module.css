@@ -1,0 +1,39 @@
+.card {
+  display: flex;
+  align-items: flex-start;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+/* Slotted / nested components style themselves. */
+.icon,
+.check {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.check {
+  margin-top: 1px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+}

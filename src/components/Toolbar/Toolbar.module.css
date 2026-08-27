@@ -1,0 +1,15 @@
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+}
+
+/* Stretches so the vertical Divider inside has a height to fill. */
+.divider {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}

@@ -1,0 +1,49 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+}
+
+.boxes {
+  display: inline-flex;
+  align-items: center;
+}
+
+.disabled {
+  opacity: 0.55;
+}
+
+.slot {
+  display: inline-flex;
+}
+
+/*
+ * Border colour arrives as a custom property rather than an inline style, so the
+ * :focus rule below can still win the cascade.
+ */
+.box {
+  box-sizing: border-box;
+  padding: 0;
+  border-style: solid;
+  border-color: var(--box-border);
+  outline: none;
+  font-family: inherit;
+  font-weight: 600;
+  text-align: center;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.box::placeholder {
+  color: #cbd2da;
+  font-weight: 400;
+}
+
+.box:focus {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.box:disabled {
+  cursor: not-allowed;
+}

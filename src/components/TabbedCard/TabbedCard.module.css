@@ -1,0 +1,13 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  text-align: left;
+}
+
+.body {
+  line-height: 1.55;
+}

@@ -1,0 +1,72 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Border colour rides a custom property so :focus can still win the cascade. */
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  border-style: solid;
+  border-color: var(--combo-border);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.input::placeholder {
+  color: #9aa1ab;
+}
+
+.input:focus {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 4px;
+  border-style: solid;
+  overflow-y: auto;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 5px;
+  font-family: inherit;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease, filter 0.1s ease;
+  background-color: var(--combobox-background);
+  color: var(--combobox-color);
+}
+
+/* `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.row:hover,
+.row[data-hover] {
+  background-color: var(--combobox-hover-background, var(--combobox-background));
+  color: var(--combobox-hover-color, var(--combobox-color));
+  filter: brightness(var(--combobox-hover-brightness, 1));
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

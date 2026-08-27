@@ -1,0 +1,242 @@
+.field {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.name {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.value {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- shared input chrome --- */
+
+.text,
+.number,
+.select,
+.hex {
+  width: 100%;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.text:focus,
+.number:focus,
+.select:focus,
+.swatch:focus,
+.hex:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.select {
+  cursor: pointer;
+}
+
+.textarea {
+  width: 100%;
+  padding: 8px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+
+.textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* --- number: slider + numeric input --- */
+
+.numberRow {
+  display: grid;
+  grid-template-columns: 1fr 72px;
+  align-items: center;
+  gap: 10px;
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.number {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* --- boolean: switch --- */
+
+/*
+ * `position: relative` is load-bearing: it makes this label the containing block
+ * for the absolutely-positioned input below. Without it the input anchors to the
+ * initial containing block, escapes this scrolling panel, and stretches the root
+ * document — which shows up as the whole app shell scrolling.
+ */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/*
+ * Visually hidden but still in the accessibility tree. A 0x0 / opacity:0 input
+ * gets dropped from the tree entirely, which hides the toggle from screen
+ * readers even though the wrapping label still forwards mouse clicks.
+ */
+.switchInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.switchTrack {
+  display: block;
+  width: 40px;
+  height: 23px;
+  border-radius: 999px;
+  background: #cbd2da;
+  transition: background-color 0.15s ease;
+}
+
+.switchKnob {
+  display: block;
+  width: 17px;
+  height: 17px;
+  margin: 3px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.switchInput:checked + .switchTrack {
+  background: var(--accent);
+}
+
+.switchInput:checked + .switchTrack .switchKnob {
+  transform: translateX(17px);
+}
+
+.switchInput:focus-visible + .switchTrack {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- color: swatch + hex --- */
+
+.colorRow {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.swatch {
+  width: 40px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.hex {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+.hex::placeholder {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+/*
+ * An unset color still paints black in the native swatch, so mark the control
+ * itself as "not applied" with a dashed border and a dimmed swatch.
+ */
+.swatchUnset {
+  border-style: dashed;
+  opacity: 0.45;
+}
+
+/* Handler expressions are code, so they get the code face. */
+.event {
+  width: 100%;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.event:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.event::placeholder {
+  color: var(--text-faint);
+}
+
+.hint {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-faint);
+}
+
+.hint code {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+}

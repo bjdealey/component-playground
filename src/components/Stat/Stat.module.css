@@ -1,0 +1,45 @@
+.stat {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+  transition: background-color 0.1s ease, filter 0.1s ease;
+  background-color: var(--stat-background);
+}
+
+.label {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.value {
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.delta {
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Only present once a click handler is, so a static stat keeps the default
+   cursor. The focus ring is the browser's own — nothing to restyle. */
+.stat[role='button'] {
+  cursor: pointer;
+}
+
+/* Scoped to the same attribute as the cursor: a stat with nothing to activate
+   must not answer the pointer, or it advertises an affordance it doesn't have.
+   `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.stat[role='button']:hover,
+.stat[role='button'][data-hover] {
+  background-color: var(--stat-hover-background, var(--stat-background));
+  filter: brightness(var(--stat-hover-brightness, 1));
+}

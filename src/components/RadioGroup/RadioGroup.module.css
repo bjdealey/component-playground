@@ -1,0 +1,74 @@
+.group {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+}
+
+.disabled {
+  opacity: 0.55;
+}
+
+.legend {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+}
+
+.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Containing block for the visually-hidden input. */
+.option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.disabled .option {
+  cursor: not-allowed;
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-style: solid;
+  border-radius: 50%;
+  transition: border-color 0.12s ease;
+}
+
+.input:focus-visible + .circle {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.dot {
+  display: block;
+  border-radius: 50%;
+}

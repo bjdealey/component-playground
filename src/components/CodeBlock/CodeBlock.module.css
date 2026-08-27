@@ -1,0 +1,63 @@
+.block {
+  box-sizing: border-box;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+  overflow: hidden;
+  text-align: left;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom-style: solid;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  line-height: 1;
+}
+
+.filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.language {
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.pre {
+  margin: 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  tab-size: 2;
+}
+
+.line {
+  display: block;
+}
+
+.number {
+  display: inline-block;
+  text-align: right;
+  margin-right: 1.2em;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.text {
+  white-space: inherit;
+}
+
+/* Keeps the language tag and the copy button together at the trailing edge, so
+   `justify-content: space-between` still pins the filename to the leading one. */
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

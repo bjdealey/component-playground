@@ -1,0 +1,38 @@
+.field {
+  display: inline-flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.input > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Nudged down so it lines up with the input, not its label. */
+.trigger {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-top: 22px;
+}
+
+.panel {
+  display: inline-flex;
+  box-sizing: border-box;
+  border-style: solid;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.10);
+}

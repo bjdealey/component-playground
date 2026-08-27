@@ -1,0 +1,302 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* The ⌘K affordance — quiet next to the wordmark, so the shortcut is visible
+   without pulling on the eye. */
+.command {
+  margin-left: 3px;
+  padding: 3px 7px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.command:hover {
+  background: var(--panel-alt);
+  color: var(--text-muted);
+}
+
+/* Touch: grow the mode switch and the ⌘K affordance — desktop density is
+   unchanged (input-method query, not a width breakpoint). */
+@media (pointer: coarse) {
+  .mode {
+    min-height: 34px;
+  }
+
+  .command {
+    min-height: 32px;
+  }
+}
+
+.mark {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+}
+
+.title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* --- mode switch --- */
+
+.modes {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.mode {
+  padding: 4px 13px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.mode:hover {
+  color: var(--text);
+}
+
+.modeActive,
+.modeActive:hover {
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.tagline {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-faint);
+  /* Fixed basis so the mode switch stays put when the text length changes. */
+  flex: 0 1 320px;
+  text-align: right;
+}
+
+.tagline code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+/* The columns are set inline, since the last one is draggable. Compose drops
+   the component list — the canvas is the subject there, and what would have
+   been a list of ninety names is the Add dialog instead. */
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--border);
+  background: var(--panel);
+}
+
+/* Height comes from the pane, so the split between the tokens and the controls
+   is yours to set. Its own class rather than a `:first-child` rule — in
+   component mode the controls panel is the first child, and it needs the full
+   column. */
+.themeSlot {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Responsive: stack the panes below 900px (portrait tablet + phone) ---
+   The desktop grid never reflows; here the body switches to one scrolling
+   column. `display: flex` makes the inline grid-template-columns moot, so the
+   panes go full-width with no per-pane override, and the splitters hide
+   themselves (Splitter.module.css). This is the one place the workbench leaves
+   its fixed-pane layout — for a screen too narrow to hold it. */
+@media (max-width: 899px) {
+  .layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* One region fills the screen at a time — the bottom tab bar switches which —
+     and each keeps its own scroll. */
+  .center,
+  .right {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .right {
+    border-left: none;
+  }
+
+  /* In the Controls tab the theme rig and block props share the pane, so cap the
+     rig and let it scroll rather than pushing the props off screen. */
+  .themeSlot {
+    height: auto !important;
+    max-height: 55vh;
+  }
+
+  /* The status line has nowhere to sit beside the mode switch. */
+  .tagline {
+    display: none;
+  }
+}
+
+/* Applied by the layout to whichever region isn't the active mobile tab. Only
+   ever present on the narrow layout. */
+.paneHidden {
+  display: none !important;
+}
+
+/* --- Mobile pane switcher --- */
+/* A bottom bar, within thumb reach, shown only on the tabbed (narrow) layout.
+   The active tab wears the accent-soft selection idiom used everywhere else. */
+.mobileTabs {
+  display: flex;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobileTab {
+  flex: 1;
+  min-height: 48px;
+  padding: 10px 8px;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.1s ease, background-color 0.1s ease;
+}
+
+.mobileTab:last-child {
+  border-right: none;
+}
+
+.mobileTabActive {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 479px) {
+  .header {
+    padding: 0 12px;
+  }
+
+  /* On a phone the wordmark yields to the mark + ⌘K + the mode switch. */
+  .title {
+    display: none;
+  }
+}
+
+.noSelection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.noSelectionTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.noSelectionBody {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* --- empty registry --- */
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.emptyBody {
+  margin: 0;
+  max-width: 460px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.emptyBody code {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+}

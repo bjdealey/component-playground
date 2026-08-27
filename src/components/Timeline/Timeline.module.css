@@ -1,0 +1,75 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  font-family: inherit;
+  text-align: left;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  transition: background-color 0.1s ease, filter 0.1s ease;
+  background-color: var(--timeline-background);
+}
+
+.time {
+  flex-shrink: 0;
+  text-align: right;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Containing block for the connector line, which spans into the next row. */
+.rail {
+  position: relative;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  padding-top: 3px;
+}
+
+.dot {
+  display: block;
+  box-sizing: border-box;
+  border-style: solid;
+  border-radius: 50%;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  line-height: 1.45;
+}
+
+.title {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Present only alongside a handler, so a read-only timeline is unaffected. */
+.row[role='button'] {
+  cursor: pointer;
+}
+
+/* Scoped to the same attribute as the cursor: a row with nothing to activate
+   must not answer the pointer, or it advertises an affordance it doesn't have.
+   `[data-hover]` is the pinned state — same rule, so the two can't drift. */
+.row[role='button']:hover,
+.row[role='button'][data-hover] {
+  background-color: var(--timeline-hover-background, var(--timeline-background));
+  filter: brightness(var(--timeline-hover-brightness, 1));
+}

@@ -1,0 +1,36 @@
+.wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  font-family: inherit;
+  text-align: left;
+}
+
+.control {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  border-style: solid;
+  overflow: hidden;
+}
+
+.disabled {
+  opacity: 0.55;
+}
+
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.suffix {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
