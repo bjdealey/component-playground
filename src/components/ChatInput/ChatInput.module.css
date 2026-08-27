@@ -1,0 +1,120 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 100%;
+}
+
+/* Send sits at the bottom, so the field grows upward from it. */
+.composer {
+  display: flex;
+  align-items: flex-end;
+  max-width: 100%;
+  border-style: solid;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.composer:focus-within {
+  border-color: var(--focus-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-color) 22%, transparent);
+}
+
+.composer[data-disabled] {
+  opacity: 0.6;
+}
+
+.attach {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.attach:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.attach:disabled {
+  cursor: default;
+}
+
+.field {
+  flex: 1;
+  min-width: 0;
+  /* A comfortable single line that a few lines of text can grow past. */
+  min-height: 32px;
+  max-height: 200px;
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+/* Progressive: browsers that support it size the field to its content. */
+@supports (field-sizing: content) {
+  .field {
+    field-sizing: content;
+  }
+}
+
+.field::placeholder {
+  color: var(--placeholder);
+}
+
+.send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.12s ease, transform 0.08s ease;
+}
+
+.send:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+/* Idle: a quiet outlined circle rather than a filled brand button. */
+.send[data-idle] {
+  box-shadow: inset 0 0 0 1px var(--send-border);
+  cursor: default;
+}
+
+.send svg {
+  display: block;
+}
+
+.stop {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+.hint {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .send:not(:disabled):active {
+    transform: none;
+  }
+}

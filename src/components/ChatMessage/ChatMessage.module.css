@@ -1,0 +1,112 @@
+.message {
+  display: flex;
+  align-items: flex-start;
+  max-width: 100%;
+}
+
+/* A user turn mirrors: avatar on the right, content pushed to the edge. */
+.message[data-role='user'] {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  flex-shrink: 0;
+  /* Sits level with the name row rather than the top of the bubble. */
+  margin-top: 2px;
+  line-height: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.message[data-role='user'] .body {
+  align-items: flex-end;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.bubble {
+  align-self: flex-start;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.message[data-role='user'] .bubble {
+  align-self: flex-end;
+}
+
+/* The generating caret — a soft block that blinks at the end of the text. */
+.caret {
+  display: inline-block;
+  width: 3px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 3px;
+  animation: caret-blink 1s steps(2, start) infinite;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 1px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.action svg {
+  display: block;
+}
+
+.action:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: var(--accent);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    animation: none;
+  }
+}
