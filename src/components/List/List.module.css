@@ -1,0 +1,79 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Clip the rows (and their hover fills) to the container's rounded corners. */
+  overflow: hidden;
+}
+
+.item {
+  display: block;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+}
+
+button.row {
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.row[data-interactive]:hover:not([data-selected]) {
+  background: var(--list-hover);
+}
+
+.row[data-interactive]:focus-visible {
+  outline: 2px solid var(--list-hover);
+  outline-offset: -2px;
+}
+
+.leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.primary {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.secondary {
+  overflow: hidden;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trailing {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
