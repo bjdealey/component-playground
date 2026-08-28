@@ -12,6 +12,7 @@ import {
 } from '../lib/theme'
 import type { Composition } from '../lib/composition'
 import { getManifest } from '../lib/registry'
+import { randomizeTheme } from '../lib/randomize'
 import styles from './ThemePanel.module.css'
 
 /**
@@ -347,6 +348,26 @@ export default function ThemePanel({
             </button>
           ))}
         </div>
+
+        <button
+          type="button"
+          className={styles.randomize}
+          title="Randomise the theme — colours stay legible and colour-blind-safe"
+          aria-label="Randomise the theme"
+          onClick={() => {
+            const next = randomizeTheme(theme)
+            onChange(next.theme)
+            onPresetPage(next.page)
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M16 3h5v5" />
+            <path d="M4 20 21 3" />
+            <path d="M21 16v5h-5" />
+            <path d="m15 15 6 6" />
+            <path d="m4 4 5 5" />
+          </svg>
+        </button>
 
         <button
           type="button"

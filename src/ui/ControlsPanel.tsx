@@ -20,6 +20,8 @@ interface ControlsPanelProps {
   onSlotPropChange: (slot: string, name: string, value: ControlValue) => void
   onSlotChildrenChange: (slot: string, text: string) => void
   onReset: () => void
+  /** Fills every setting with a fresh value — colours stay legible and CVD-safe. */
+  onRandomize: () => void
 }
 
 interface Section {
@@ -39,6 +41,7 @@ export default function ControlsPanel({
   onSlotPropChange,
   onSlotChildrenChange,
   onReset,
+  onRandomize,
 }: ControlsPanelProps) {
   // Selecting a different component should land you at the top of its controls,
   // not wherever the previous component happened to be scrolled to.
@@ -89,9 +92,26 @@ export default function ControlsPanel({
     <aside className={styles.panel} aria-label="Controls">
       <div className={styles.header}>
         <span className={styles.title}>Controls</span>
-        <button type="button" className={styles.reset} onClick={onReset}>
-          Reset to defaults
-        </button>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.randomize}
+            onClick={onRandomize}
+            title="Randomise every setting — colours stay legible and colour-blind-safe"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M16 3h5v5" />
+              <path d="M4 20 21 3" />
+              <path d="M21 16v5h-5" />
+              <path d="m15 15 6 6" />
+              <path d="m4 4 5 5" />
+            </svg>
+            Randomise
+          </button>
+          <button type="button" className={styles.reset} onClick={onReset}>
+            Reset to defaults
+          </button>
+        </div>
       </div>
 
       {note && <p className={styles.note}>{note}</p>}

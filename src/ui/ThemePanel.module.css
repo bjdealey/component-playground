@@ -77,6 +77,30 @@
   transition: background-color 0.1s ease, color 0.1s ease;
 }
 
+/* Compact accent icon button — the exploratory sibling of Reset. */
+.randomize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.randomize:hover {
+  background: color-mix(in srgb, var(--accent) 15%, var(--panel));
+}
+
+.randomize svg {
+  display: block;
+}
+
 .reset:hover {
   background: var(--panel-alt);
   color: var(--text);

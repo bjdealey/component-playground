@@ -15,6 +15,7 @@ import {
 import { DEFAULT_SCENE, buildScene, sceneByName } from '../lib/scenes'
 import { generatePage, generateTokens } from '../lib/compositionCodegen'
 import { defaultTheme, type Theme } from '../lib/theme'
+import { randomizeValues } from '../lib/randomize'
 import type {
   ComponentManifest,
   ControlValue,
@@ -333,6 +334,29 @@ export default function App() {
     setValuesByName((prev) => ({
       ...prev,
       [manifest.name]: defaultValues(manifest),
+    }))
+  }
+
+  /**
+   * Fill every setting with a fresh value. Colours are drawn from one coherent,
+   * WCAG-legible, colour-blind-safe palette keyed to the stage's light/dark — see
+   * `randomizeValues`. Content and handlers are left alone.
+   */
+  function handleRandomize() {
+    if (mode === 'compose') {
+      if (!selectedBlock || !selectedBlockManifest) return
+      setComposition((prev) =>
+        updateBlock(prev, selectedBlock.id, (current) =>
+          randomizeValues(selectedBlockManifest, current, theme.mode),
+        ),
+      )
+      return
+    }
+
+    if (!manifest || !values) return
+    setValuesByName((prev) => ({
+      ...prev,
+      [manifest.name]: randomizeValues(manifest, values, stageTheme),
     }))
   }
 
@@ -686,6 +710,7 @@ export default function App() {
                 onSlotPropChange={handleSlotPropChange}
                 onSlotChildrenChange={handleSlotChildrenChange}
                 onReset={handleReset}
+                onRandomize={handleRandomize}
               />
             ) : (
               <div className={styles.noSelection}>

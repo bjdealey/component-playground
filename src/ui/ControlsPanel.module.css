@@ -57,6 +57,44 @@
   color: var(--text);
 }
 
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The one inviting control in the header — accent-tinted, since it's the
+   exploratory action rather than the corrective one. */
+.randomize {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.randomize:hover {
+  background: color-mix(in srgb, var(--accent) 15%, var(--panel));
+}
+
+.randomize svg {
+  display: block;
+}
+
+@media (pointer: coarse) {
+  .randomize,
+  .reset {
+    min-height: 34px;
+  }
+}
+
 .body {
   flex: 1;
   min-height: 0;
