@@ -1,0 +1,150 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  border-style: solid;
+  font-family: inherit;
+}
+
+.title {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 5px 0 0;
+  line-height: 1.5;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.socialButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-width: 1px;
+  border-style: solid;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: background-color 0.1s ease;
+}
+
+.socialButton:hover {
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  font-size: 0.85em;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-weight: 500;
+  font-size: 0.92em;
+}
+
+.input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-width: 1px;
+  border-style: solid;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.input:focus {
+  border-color: var(--signin-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--signin-accent) 20%, transparent);
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.92em;
+}
+
+.checkbox {
+  width: 15px;
+  height: 15px;
+}
+
+.submit {
+  min-height: 42px;
+  margin-top: 4px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  transition: filter 0.1s ease;
+}
+
+.submit:hover {
+  filter: brightness(0.94);
+}
+
+.footer {
+  margin: 18px 0 0;
+  text-align: center;
+  line-height: 1.5;
+  font-size: 0.92em;
+}
+
+.link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,75 @@
+.wrap {
+  overflow: hidden;
+  border-style: solid;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.corner,
+.planHead,
+.feature,
+.cell {
+  border-bottom: 1px solid;
+  vertical-align: middle;
+}
+
+.corner {
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.85em;
+}
+
+.planHead {
+  position: relative;
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.planButton {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.78em;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.feature {
+  text-align: left;
+  font-weight: 500;
+}
+
+.cell {
+  text-align: center;
+}
+
+.check {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.dash {
+  font-size: 1.1em;
+}
+
+/* The container's own border closes the table, so the last row draws none. */
+tbody tr:last-child .feature,
+tbody tr:last-child .cell {
+  border-bottom: none;
+}
