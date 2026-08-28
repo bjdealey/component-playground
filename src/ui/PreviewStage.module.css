@@ -52,26 +52,32 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Pixel-art mode. The bitmap font is the effect; squared corners and crisp
-   rendering complete it. `--px` (1–4) intensifies the retro treatment. */
+/* Pixel-art mode. The mosaic filter is laid over the *real* component, so its
+   rounded corners and every other edit survive — a curve just stair-steps into
+   pixels rather than squaring off. The bitmap font completes the retro look. */
 .pixelArt {
   font-family: var(--pixel-font);
   -webkit-font-smoothing: none;
-  filter: contrast(calc(1 + var(--px, 1) * 0.05)) saturate(calc(1 + var(--px, 1) * 0.1));
-  /* A hard offset drop-shadow in each element's own ink — the classic pixel
-     double-print — growing with intensity. Inherited, so it reaches all text. */
-  text-shadow: calc(var(--px, 1) * 0.4px) calc(var(--px, 1) * 0.4px) 0
-    color-mix(in srgb, currentColor 26%, transparent);
+  filter: url(#preview-pixelate);
 }
 
-/* Force the bitmap font onto every element — even the monospace ones — and
-   square every corner, overriding the components' own inline radii. */
+/* Force the bitmap font onto every element — it carries the low levels, where the
+   mosaic is light. Radii and every other edit are left alone: the filter above
+   pixelates the real component in place, so a curve stair-steps in the corner
+   rather than squaring off. */
 .pixelArt *,
 .pixelArt *::before,
 .pixelArt *::after {
   font-family: var(--pixel-font) !important;
-  border-radius: 0 !important;
   image-rendering: pixelated;
+}
+
+/* Holds the filter definition only; never drawn itself. */
+.pixelDefs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .label {
