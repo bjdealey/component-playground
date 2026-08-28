@@ -43,6 +43,23 @@
   src: url('../assets/fonts/pixelify-sans-700.woff2') format('woff2');
 }
 
+/* Pixel-art mode hides CSS corner-rounding so the JS-applied staircase clip is
+   the only corner shape. lib/pixelate toggles this class on the preview canvas —
+   off while it measures each element's real border-radius, on for display — and
+   !important is what lets it win over a component's inline border-radius (so the
+   stepped corner keeps tracking the radius control instead of freezing). */
+.pixel-stepping,
+.pixel-stepping * {
+  border-radius: 0 !important;
+}
+
+/* A bordered rounded box gets its border redrawn as a stepped ring overlay
+   (lib/pixelate) so it follows the corners; hide the real square-cornered border
+   underneath, which the outer clip would otherwise slice into fragments. */
+.pixel-stepping [data-pxl-border] {
+  border-color: transparent !important;
+}
+
 *,
 *::before,
 *::after {

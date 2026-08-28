@@ -80,7 +80,7 @@ export default function PreviewStage({
     const px = PIXEL_PX[pixel]
     let raf = 0
     const apply = () => {
-      restorePixelArt(appliedRef.current)
+      restorePixelArt(appliedRef.current, root)
       appliedRef.current = pixelateSubtree(root, px)
     }
     apply()
@@ -92,7 +92,7 @@ export default function PreviewStage({
     return () => {
       cancelAnimationFrame(raf)
       observer.disconnect()
-      restorePixelArt(appliedRef.current)
+      restorePixelArt(appliedRef.current, root)
       appliedRef.current = []
     }
   }, [pixel, manifest.name, values, theme])
