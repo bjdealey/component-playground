@@ -138,6 +138,12 @@ export default function App() {
   }, [navCollapsed])
   const railMode = navCollapsed && !isMobile
 
+  // The phone has no room for the tile grid, so on a narrow screen the gallery
+  // *is* the component list — entering it lands on the list tab to browse from.
+  useEffect(() => {
+    if (isMobile && mode === 'gallery') setMobileTab('list')
+  }, [isMobile, mode])
+
   /**
    * Interact mode: the page, and nothing else.
    *
@@ -558,11 +564,18 @@ export default function App() {
   const bare = composing && interactive
 
   // Tabs replace the side-by-side panes on a narrow screen. Interact mode is the
-  // page alone, so it keeps no tabs. The list tab only exists in Component mode,
-  // so a stale 'list' falls back to the preview in Compose.
-  const tabbed = isMobile && !bare && mode !== 'gallery'
+  // page alone, so it keeps no tabs. The list tab only exists outside Compose,
+  // so a stale 'list' falls back to the preview there.
+  const tabbed = isMobile && !bare
   const activeTab: MobileTab = composing && mobileTab === 'list' ? 'view' : mobileTab
   const hidden = (tab: MobileTab) => (tabbed && activeTab !== tab ? styles.paneHidden : '')
+
+  // On a phone the controls open as a bottom sheet over the preview rather than a
+  // full-screen tab, so the preview stays in view. The preview shows on both the
+  // view and edit tabs — only the list tab replaces it — and the code and event
+  // log below the preview step aside while the sheet is up.
+  const controlsSheet = tabbed && activeTab === 'edit'
+  const centerHidden = tabbed && activeTab === 'list' ? styles.paneHidden : ''
 
   const columns = bare
     ? 'minmax(0, 1fr)'
@@ -638,7 +651,7 @@ export default function App() {
         </p>
       </header>
 
-      {mode === 'gallery' && manifests.length > 0 ? (
+      {mode === 'gallery' && !isMobile && manifests.length > 0 ? (
         <Gallery manifests={manifests} onOpen={openComponent} />
       ) : manifest && values ? (
         <div
@@ -660,7 +673,7 @@ export default function App() {
             />
           )}
 
-          <main className={`${styles.center} ${hidden('view')}`}>
+          <main className={`${styles.center} ${centerHidden}`}>
             {composing ? (
               <ComposeStage
                 composition={composition}
@@ -697,18 +710,24 @@ export default function App() {
               />
             )}
 
-            <EventLog events={events} onClear={() => setEvents([])} />
+            <div
+              className={`${styles.centerSecondary} ${
+                controlsSheet ? styles.paneHidden : ''
+              }`}
+            >
+              <EventLog events={events} onClear={() => setEvents([])} />
 
-            <Splitter pane={codePane} label="Code panel height" />
+              <Splitter pane={codePane} label="Code panel height" />
 
-            <CodePanel
-              height={codeHeight}
-              snippets={composing ? pageSnippets : { ...snippets, full }}
-              views={composing ? PAGE_VIEWS : COMPONENT_VIEWS}
-              includeDefaults={includeDefaults}
-              onIncludeDefaultsChange={setIncludeDefaults}
-              onNeedFull={() => setWantFull(true)}
-            />
+              <CodePanel
+                height={codeHeight}
+                snippets={composing ? pageSnippets : { ...snippets, full }}
+                views={composing ? PAGE_VIEWS : COMPONENT_VIEWS}
+                includeDefaults={includeDefaults}
+                onIncludeDefaultsChange={setIncludeDefaults}
+                onNeedFull={() => setWantFull(true)}
+              />
+            </div>
           </main>
 
           {!bare && <Splitter pane={rightPane} label="Controls panel width" />}
