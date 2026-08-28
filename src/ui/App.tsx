@@ -51,6 +51,19 @@ const MODES: { id: Mode; label: string; hint: string }[] = [
 /** The three layout regions become tabs on a narrow screen. */
 type MobileTab = 'list' | 'view' | 'edit'
 
+/** Width of the collapsed component rail — wide enough for a 20px icon + hit area. */
+const RAIL_WIDTH = 54
+
+const NAV_COLLAPSED_KEY = 'playground:nav:collapsed'
+
+function readNavCollapsed(): boolean {
+  try {
+    return window.localStorage.getItem(NAV_COLLAPSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 /** Tracks a media query, so the layout can switch to tabs below the breakpoint. */
 function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
@@ -111,6 +124,18 @@ export default function App() {
   // don't need to guard on width.
   const isMobile = useMediaQuery('(max-width: 899px)')
   const [mobileTab, setMobileTab] = useState<MobileTab>('view')
+
+  // The component list can fold to an icon rail to give the preview its width
+  // back. Only on the wide layout — on a phone the list is its own full tab.
+  const [navCollapsed, setNavCollapsed] = useState(readNavCollapsed)
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(NAV_COLLAPSED_KEY, navCollapsed ? '1' : '0')
+    } catch {
+      // A rail that forgets its state across reloads is not worth throwing over.
+    }
+  }, [navCollapsed])
+  const railMode = navCollapsed && !isMobile
 
   /**
    * Interact mode: the page, and nothing else.
@@ -542,7 +567,7 @@ export default function App() {
     ? 'minmax(0, 1fr)'
     : composing
       ? `minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
-      : `216px minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
+      : `${railMode ? RAIL_WIDTH : 216}px minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
 
   // In compose mode the controls panel follows the canvas selection, so with
   // nothing selected there is nothing to configure.
@@ -616,6 +641,8 @@ export default function App() {
                 setMobileTab('view')
               }}
               onStep={handleStep}
+              railMode={railMode}
+              onToggleCollapse={() => setNavCollapsed((v) => !v)}
             />
           )}
 

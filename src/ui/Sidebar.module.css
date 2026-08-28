@@ -27,9 +27,50 @@
   color: var(--text-faint);
 }
 
+.headingRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .count {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+}
+
+/* The collapse control — squares the panel down to the icon rail. Quiet until
+   hovered, so it doesn't compete with the heading. */
+.collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.collapse:hover {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.collapse svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* The collapse control is a desktop affordance — on the narrow layout the list
+   is its own full tab, with nothing to collapse into. */
+@media (max-width: 899px) {
+  .collapse {
+    display: none;
+  }
 }
 
 /* Containing block for the clear button. */
@@ -172,6 +213,13 @@
   transform: rotate(90deg);
 }
 
+.sectionIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
 .sectionName {
   flex: 1;
   font-size: 10.5px;
@@ -226,7 +274,22 @@
   font-weight: 600;
 }
 
+.itemIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  /* A shade quieter than the name, so the label stays the thing you read. */
+  color: var(--text-faint);
+  transition: color 0.1s ease;
+}
+
+.item:hover .itemIcon,
+.active .itemIcon {
+  color: inherit;
+}
+
 .itemName {
+  flex: 1;
   font-family: var(--mono);
   font-size: 13px;
   overflow: hidden;
@@ -250,4 +313,100 @@
   font-size: 11px;
   line-height: 1.35;
   color: var(--text-faint);
+}
+
+/* --- collapsed icon rail --- */
+
+.rail {
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.railExpand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  margin-bottom: 4px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.railExpand:hover {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.railExpand svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* Category clusters, split by the faded category glyph that heads each. */
+.railSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.railSection + .railSection {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.railCategory {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  color: var(--text-faint);
+  opacity: 0.7;
+}
+
+.railCatIcon {
+  width: 13px;
+  height: 13px;
+}
+
+.railItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.railItem:hover {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.railActive,
+.railActive:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.railIcon {
+  width: 20px;
+  height: 20px;
 }
