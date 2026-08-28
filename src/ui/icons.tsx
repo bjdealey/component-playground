@@ -608,6 +608,28 @@ const GLYPHS: Record<string, ReactNode> = {
   quote: (
     <path d="M9.5 6.5C7 7.5 5.5 9.8 5.5 13v4.5H10V13H7.6c0-1.8.9-3.4 2.4-4.2zM18.5 6.5C16 7.5 14.5 9.8 14.5 13v4.5H19V13h-2.4c0-1.8.9-3.4 2.4-4.2z" />
   ),
+
+  // --- app chrome (not component icons): the menu toggle + mobile nav ---
+  hamburger: <path d="M4 7h16M4 12h16M4 17h16" />,
+  eye: (
+    <>
+      <path d="M2 12s3.6-6.5 10-6.5 10 6.5 10 6.5-3.6 6.5-10 6.5S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M4 8h16M4 16h16" />
+      <path d="M14 6v4M9 14v4" />
+    </>
+  ),
+  canvas: (
+    <>
+      <rect x="3.5" y="5" width="17" height="14" rx="2" />
+      <path d="M3.5 9h17" />
+      <path d="M6 7h.01M8 7h.01" />
+    </>
+  ),
 }
 
 /** Component name → glyph key. Unmapped names fall through to the category. */

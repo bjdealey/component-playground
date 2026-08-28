@@ -22,6 +22,34 @@
   gap: 9px;
 }
 
+/* The component-list toggle. A hamburger in the conventional top-left spot, so
+   it's always reachable — unlike a control that scrolls away inside the list. */
+.hamburger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 -2px 0 -6px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.hamburger:hover {
+  background: var(--panel-alt);
+  color: var(--text);
+}
+
+.hamburger svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* The ⌘K affordance — quiet next to the wordmark, so the shortcut is visible
    without pulling on the eye. */
 .command {
@@ -211,17 +239,27 @@
 }
 
 .mobileTab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   flex: 1;
-  min-height: 48px;
-  padding: 10px 8px;
+  min-height: 54px;
+  padding: 8px;
   border: none;
   border-right: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 500;
   cursor: pointer;
   transition: color 0.1s ease, background-color 0.1s ease;
+}
+
+.mobileTabIcon {
+  width: 21px;
+  height: 21px;
 }
 
 .mobileTab:last-child {

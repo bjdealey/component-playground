@@ -4,27 +4,6 @@ import { FALLBACK_CATEGORY, orderCategories } from '../lib/categories'
 import { Glyph, componentIconKey, categoryIconKey } from './icons'
 import styles from './Sidebar.module.css'
 
-/** Chevrons for the collapse/expand control — chrome, not a component icon. */
-function Chevrons({ dir }: { dir: 'left' | 'right' }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {dir === 'left' ? (
-        <path d="M13 7l-5 5 5 5M18 7l-5 5 5 5" />
-      ) : (
-        <path d="M11 7l5 5-5 5M6 7l5 5-5 5" />
-      )}
-    </svg>
-  )
-}
-
 interface SidebarProps {
   /** Merged onto the root, so the layout can hide it on an inactive mobile tab. */
   className?: string
@@ -39,7 +18,6 @@ interface SidebarProps {
   onStep: (delta: number, pool: string[]) => void
   /** Folded to an icon rail — desktop only; the owner gates it on width. */
   railMode: boolean
-  onToggleCollapse: () => void
 }
 
 function controlCount(manifest: ComponentManifest): number {
@@ -66,7 +44,6 @@ export default function Sidebar({
   onSelect,
   onStep,
   railMode,
-  onToggleCollapse,
 }: SidebarProps) {
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
@@ -195,17 +172,6 @@ export default function Sidebar({
         className={`${styles.sidebar} ${styles.rail} ${className ?? ''}`}
         aria-label="Components"
       >
-        <button
-          type="button"
-          className={styles.railExpand}
-          title="Expand the component list"
-          aria-label="Expand the component list"
-          aria-expanded={false}
-          onClick={onToggleCollapse}
-        >
-          <Chevrons dir="right" />
-        </button>
-
         {sections.map((section) => (
           <div key={section.name} className={styles.railSection}>
             <span
@@ -242,21 +208,9 @@ export default function Sidebar({
     <nav className={`${styles.sidebar} ${className ?? ''}`} aria-label="Components">
       <div className={styles.heading}>
         Components
-        <div className={styles.headingRight}>
-          <span className={styles.count}>
-            {needle ? `${visible.length}/${manifests.length}` : manifests.length}
-          </span>
-          <button
-            type="button"
-            className={styles.collapse}
-            title="Collapse the component list"
-            aria-label="Collapse the component list"
-            aria-expanded={true}
-            onClick={onToggleCollapse}
-          >
-            <Chevrons dir="left" />
-          </button>
-        </div>
+        <span className={styles.count}>
+          {needle ? `${visible.length}/${manifests.length}` : manifests.length}
+        </span>
       </div>
 
       <div className={styles.searchRow}>

@@ -34,6 +34,7 @@ import CommandMenu, { type Command } from './CommandMenu'
 import ControlsPanel from './ControlsPanel'
 import CodePanel, { COMPONENT_VIEWS, PAGE_VIEWS } from './CodePanel'
 import EventLog from './EventLog'
+import { Glyph } from './icons'
 import styles from './App.module.css'
 
 type Mode = 'gallery' | 'component' | 'compose'
@@ -578,6 +579,20 @@ export default function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.brand}>
+          {mode === 'component' && !isMobile && (
+            <button
+              type="button"
+              className={styles.hamburger}
+              title={
+                navCollapsed ? 'Expand the component list' : 'Collapse the component list'
+              }
+              aria-label="Toggle the component list"
+              aria-expanded={!navCollapsed}
+              onClick={() => setNavCollapsed((v) => !v)}
+            >
+              <Glyph name="hamburger" />
+            </button>
+          )}
           <span className={styles.mark} aria-hidden="true" />
           <h1 className={styles.title}>Component Playground</h1>
           <button
@@ -642,7 +657,6 @@ export default function App() {
               }}
               onStep={handleStep}
               railMode={railMode}
-              onToggleCollapse={() => setNavCollapsed((v) => !v)}
             />
           )}
 
@@ -766,13 +780,13 @@ export default function App() {
         <nav className={styles.mobileTabs} aria-label="Panel">
           {(composing
             ? [
-                { id: 'view' as const, label: 'Canvas' },
-                { id: 'edit' as const, label: 'Controls' },
+                { id: 'view' as const, label: 'Canvas', icon: 'canvas' },
+                { id: 'edit' as const, label: 'Controls', icon: 'sliders' },
               ]
             : [
-                { id: 'list' as const, label: 'Components' },
-                { id: 'view' as const, label: 'Preview' },
-                { id: 'edit' as const, label: 'Controls' },
+                { id: 'list' as const, label: 'Components', icon: 'list' },
+                { id: 'view' as const, label: 'Preview', icon: 'eye' },
+                { id: 'edit' as const, label: 'Controls', icon: 'sliders' },
               ]
           ).map((tab) => (
             <button
@@ -784,6 +798,7 @@ export default function App() {
               aria-pressed={activeTab === tab.id}
               onClick={() => setMobileTab(tab.id)}
             >
+              <Glyph name={tab.icon} className={styles.mobileTabIcon} />
               {tab.label}
             </button>
           ))}

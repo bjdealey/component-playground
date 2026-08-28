@@ -27,50 +27,9 @@
   color: var(--text-faint);
 }
 
-.headingRight {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .count {
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
-}
-
-/* The collapse control — squares the panel down to the icon rail. Quiet until
-   hovered, so it doesn't compete with the heading. */
-.collapse {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-faint);
-  cursor: pointer;
-  transition: background-color 0.1s ease, color 0.1s ease;
-}
-
-.collapse:hover {
-  background: var(--panel-alt);
-  color: var(--text);
-}
-
-.collapse svg {
-  width: 15px;
-  height: 15px;
-}
-
-/* The collapse control is a desktop affordance — on the narrow layout the list
-   is its own full tab, with nothing to collapse into. */
-@media (max-width: 899px) {
-  .collapse {
-    display: none;
-  }
 }
 
 /* Containing block for the clear button. */
@@ -323,32 +282,6 @@
   flex-direction: column;
   align-items: center;
   gap: 2px;
-}
-
-.railExpand {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 32px;
-  margin-bottom: 4px;
-  padding: 0;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--text-faint);
-  cursor: pointer;
-  transition: background-color 0.1s ease, color 0.1s ease;
-}
-
-.railExpand:hover {
-  background: var(--panel-alt);
-  color: var(--text);
-}
-
-.railExpand svg {
-  width: 15px;
-  height: 15px;
 }
 
 /* Category clusters, split by the faded category glyph that heads each. */
