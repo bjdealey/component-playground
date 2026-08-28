@@ -21,6 +21,26 @@
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  /* Self-hosted (offline) — drives the preview's Pixel-art mode. */
+  --pixel-font: 'Pixelify Sans', ui-monospace, monospace;
+}
+
+/* Pixelify Sans (OFL) — bundled, never fetched at runtime. See
+   assets/fonts/Pixelify-Sans-OFL.txt. */
+@font-face {
+  font-family: 'Pixelify Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/pixelify-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Pixelify Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/pixelify-sans-700.woff2') format('woff2');
 }
 
 *,

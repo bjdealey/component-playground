@@ -56,6 +56,12 @@ typography:
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "normal"
+  # Opt-in only: the preview's Pixel-art mode restyles the component under review
+  # in this bitmap face. Never part of the chrome or a component's own defaults.
+  pixel:
+    fontFamily: "'Pixelify Sans', ui-monospace, monospace"
+    fontWeight: 400
+    note: "Self-hosted (OFL), bundled offline. Drives Pixel-art preview mode."
   scale:
     icon: "15px"
 rounded:

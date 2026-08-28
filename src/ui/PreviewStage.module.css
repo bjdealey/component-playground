@@ -52,12 +52,26 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Holds the filter definition only; never drawn itself. */
-.pixelDefs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
+/* Pixel-art mode. The bitmap font is the effect; squared corners and crisp
+   rendering complete it. `--px` (1–4) intensifies the retro treatment. */
+.pixelArt {
+  font-family: var(--pixel-font);
+  -webkit-font-smoothing: none;
+  filter: contrast(calc(1 + var(--px, 1) * 0.05)) saturate(calc(1 + var(--px, 1) * 0.1));
+  /* A hard offset drop-shadow in each element's own ink — the classic pixel
+     double-print — growing with intensity. Inherited, so it reaches all text. */
+  text-shadow: calc(var(--px, 1) * 0.4px) calc(var(--px, 1) * 0.4px) 0
+    color-mix(in srgb, currentColor 26%, transparent);
+}
+
+/* Force the bitmap font onto every element — even the monospace ones — and
+   square every corner, overriding the components' own inline radii. */
+.pixelArt *,
+.pixelArt *::before,
+.pixelArt *::after {
+  font-family: var(--pixel-font) !important;
+  border-radius: 0 !important;
+  image-rendering: pixelated;
 }
 
 .label {
