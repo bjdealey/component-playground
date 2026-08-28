@@ -192,6 +192,96 @@
   overflow: hidden;
 }
 
+/* --- mobile: the component list as a slide-in drawer --- */
+/* Below the header, so its hamburger stays put to toggle it back shut. Only ever
+   rendered on the narrow layout. */
+.scrim {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: rgba(15, 23, 42, 0.42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.scrimShown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  bottom: 0;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  width: min(82vw, 320px);
+  background: var(--panel);
+  box-shadow: 6px 0 28px -10px rgba(15, 23, 42, 0.4);
+  transform: translateX(-100%);
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+/* The drilled-in preview's toolbar: Back to the gallery, and the controls sheet
+   toggle. Only shown for a single component on a phone. */
+.mobileBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobileBack,
+.mobileControlsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px 6px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+}
+
+.mobileControlsToggle {
+  padding: 6px 12px;
+}
+
+.mobileBack:hover,
+.mobileControlsToggle:hover {
+  color: var(--text);
+}
+
+.mobileBack svg,
+.mobileControlsToggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mobileControlsToggleOn,
+.mobileControlsToggleOn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 /* --- Responsive: stack the panes below 900px (portrait tablet + phone) ---
    The desktop grid never reflows; here the body switches to one scrolling
    column. `display: flex` makes the inline grid-template-columns moot, so the

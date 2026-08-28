@@ -126,6 +126,12 @@ export default function App() {
   const isMobile = useMediaQuery('(max-width: 899px)')
   const [mobileTab, setMobileTab] = useState<MobileTab>('view')
 
+  // The phone's chrome overlays rather than docking: the component list slides
+  // in as a drawer from the header hamburger, and the controls rise as a bottom
+  // sheet over the preview. Both are dismissible, neither is a persistent pane.
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [mobileControlsOpen, setMobileControlsOpen] = useState(false)
+
   // The component list can fold to an icon rail to give the preview its width
   // back. Only on the wide layout — on a phone the list is its own full tab.
   const [navCollapsed, setNavCollapsed] = useState(readNavCollapsed)
@@ -138,11 +144,23 @@ export default function App() {
   }, [navCollapsed])
   const railMode = navCollapsed && !isMobile
 
-  // The phone has no room for the tile grid, so on a narrow screen the gallery
-  // *is* the component list — entering it lands on the list tab to browse from.
+  // On a phone, drilling into a component is a fresh screen: close the list
+  // drawer and the controls sheet whenever the shown component or the mode
+  // changes, so each lands clean rather than remembering the last overlay.
   useEffect(() => {
-    if (isMobile && mode === 'gallery') setMobileTab('list')
-  }, [isMobile, mode])
+    setDrawerOpen(false)
+    setMobileControlsOpen(false)
+  }, [selected, mode])
+
+  // Escape closes the list drawer, the way it dismisses any overlay.
+  useEffect(() => {
+    if (!drawerOpen) return
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setDrawerOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [drawerOpen])
 
   /**
    * Interact mode: the page, and nothing else.
@@ -563,19 +581,19 @@ export default function App() {
 
   const bare = composing && interactive
 
-  // Tabs replace the side-by-side panes on a narrow screen. Interact mode is the
-  // page alone, so it keeps no tabs. The list tab only exists outside Compose,
-  // so a stale 'list' falls back to the preview there.
-  const tabbed = isMobile && !bare
-  const activeTab: MobileTab = composing && mobileTab === 'list' ? 'view' : mobileTab
-  const hidden = (tab: MobileTab) => (tabbed && activeTab !== tab ? styles.paneHidden : '')
+  // On a phone the panes stop docking side by side. Compose keeps a small tab
+  // bar (Canvas / Controls); the gallery-and-component flow drills in instead —
+  // the grid opens a component's preview, left again with a Back button, while
+  // the component list and the controls arrive as overlays over it.
+  const tabbed = isMobile && composing && !bare
+  const activeTab: MobileTab = mobileTab === 'list' ? 'view' : mobileTab
 
-  // On a phone the controls open as a bottom sheet over the preview rather than a
-  // full-screen tab, so the preview stays in view. The preview shows on both the
-  // view and edit tabs — only the list tab replaces it — and the code and event
-  // log below the preview step aside while the sheet is up.
-  const controlsSheet = tabbed && activeTab === 'edit'
-  const centerHidden = tabbed && activeTab === 'list' ? styles.paneHidden : ''
+  // Component mode on a phone is a single drilled-in preview. The controls ride
+  // up as a bottom sheet — from that view's own toggle, or the compose tab — and
+  // the code and event log fold away beneath the preview while it's up.
+  const mobilePreview = isMobile && !composing
+  const controlsOpen = isMobile && (composing ? activeTab === 'edit' : mobileControlsOpen)
+  const rightHidden = !isMobile || controlsOpen ? '' : styles.paneHidden
 
   const columns = bare
     ? 'minmax(0, 1fr)'
@@ -592,16 +610,22 @@ export default function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.brand}>
-          {mode === 'component' && !isMobile && (
+          {(isMobile || mode === 'component') && (
             <button
               type="button"
               className={styles.hamburger}
               title={
-                navCollapsed ? 'Expand the component list' : 'Collapse the component list'
+                isMobile
+                  ? 'Show the component list'
+                  : navCollapsed
+                    ? 'Expand the component list'
+                    : 'Collapse the component list'
               }
-              aria-label="Toggle the component list"
-              aria-expanded={!navCollapsed}
-              onClick={() => setNavCollapsed((v) => !v)}
+              aria-label={isMobile ? 'Open the component list' : 'Toggle the component list'}
+              aria-expanded={isMobile ? drawerOpen : !navCollapsed}
+              onClick={() =>
+                isMobile ? setDrawerOpen((o) => !o) : setNavCollapsed((v) => !v)
+              }
             >
               <Glyph name="hamburger" />
             </button>
@@ -651,29 +675,74 @@ export default function App() {
         </p>
       </header>
 
-      {mode === 'gallery' && !isMobile && manifests.length > 0 ? (
+      {isMobile && (
+        <>
+          <div
+            className={`${styles.scrim} ${drawerOpen ? styles.scrimShown : ''}`}
+            onClick={() => setDrawerOpen(false)}
+            aria-hidden="true"
+          />
+          <aside
+            className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ''}`}
+            aria-label="Components"
+            aria-hidden={!drawerOpen}
+          >
+            <Sidebar
+              manifests={manifests}
+              selected={activeName}
+              onSelect={(name) => {
+                setSelected(name)
+                setMode('component')
+                setDrawerOpen(false)
+              }}
+              onStep={handleStep}
+              railMode={false}
+            />
+          </aside>
+        </>
+      )}
+
+      {mode === 'gallery' && manifests.length > 0 ? (
         <Gallery manifests={manifests} onOpen={openComponent} />
       ) : manifest && values ? (
         <div
           className={styles.layout}
           style={{ gridTemplateColumns: columns }}
         >
-          {!composing && (
+          {!composing && !isMobile && (
             <Sidebar
-              className={hidden('list')}
               manifests={manifests}
               selected={activeName}
-              onSelect={(name) => {
-                setSelected(name)
-                // Picking a component on the phone jumps to its preview.
-                setMobileTab('view')
-              }}
+              onSelect={(name) => setSelected(name)}
               onStep={handleStep}
               railMode={railMode}
             />
           )}
 
-          <main className={`${styles.center} ${centerHidden}`}>
+          <main className={styles.center}>
+            {mobilePreview && (
+              <div className={styles.mobileBar}>
+                <button
+                  type="button"
+                  className={styles.mobileBack}
+                  onClick={() => setMode('gallery')}
+                >
+                  <Glyph name="chevronLeft" />
+                  Gallery
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.mobileControlsToggle} ${
+                    mobileControlsOpen ? styles.mobileControlsToggleOn : ''
+                  }`}
+                  aria-pressed={mobileControlsOpen}
+                  onClick={() => setMobileControlsOpen((o) => !o)}
+                >
+                  <Glyph name="sliders" />
+                  Controls
+                </button>
+              </div>
+            )}
             {composing ? (
               <ComposeStage
                 composition={composition}
@@ -712,7 +781,7 @@ export default function App() {
 
             <div
               className={`${styles.centerSecondary} ${
-                controlsSheet ? styles.paneHidden : ''
+                controlsOpen ? styles.paneHidden : ''
               }`}
             >
               <EventLog events={events} onClear={() => setEvents([])} />
@@ -733,7 +802,7 @@ export default function App() {
           {!bare && <Splitter pane={rightPane} label="Controls panel width" />}
 
           {!bare && (
-          <div className={`${styles.right} ${hidden('edit')}`}>
+          <div className={`${styles.right} ${rightHidden}`}>
             {composing && (
               <>
                 <div className={styles.themeSlot} style={{ height: themePane.size }}>

@@ -611,6 +611,7 @@ const GLYPHS: Record<string, ReactNode> = {
 
   // --- app chrome (not component icons): the menu toggle + mobile nav ---
   hamburger: <path d="M4 7h16M4 12h16M4 17h16" />,
+  chevronLeft: <path d="M14.5 6l-6 6 6 6" />,
   eye: (
     <>
       <path d="M2 12s3.6-6.5 10-6.5 10 6.5 10 6.5-3.6 6.5-10 6.5S2 12 2 12z" />
