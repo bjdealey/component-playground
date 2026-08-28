@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { manifests, getManifest } from '../lib/registry'
 import { defaultValues, defaultValuesForAll } from '../lib/values'
+import { effectDefaults } from '../lib/effects'
 import { generateJSX, generateUsage } from '../lib/codegen'
 import { readUrl, writeUrl } from '../lib/urlState'
 import { readComposeUrl, writeComposeUrl } from '../lib/compositionUrl'
@@ -349,6 +350,25 @@ export default function App() {
 
   function handleChildrenChange(text: string) {
     editActive((prev) => ({ ...prev, children: text }))
+  }
+
+  /**
+   * Component-level preview effects (shadow / highlight / gradient). Kept off the
+   * editActive path because they're single-component only — compose blocks don't
+   * carry them — and stored under their own `effects` key, never as props.
+   */
+  function handleEffectChange(name: string, value: ControlValue) {
+    if (!manifest) return
+    setValuesByName((prev) => {
+      const current = prev[activeName] ?? defaultValues(manifest)
+      return {
+        ...prev,
+        [activeName]: {
+          ...current,
+          effects: { ...(current.effects ?? effectDefaults()), [name]: value },
+        },
+      }
+    })
   }
 
   function editSlot(slot: string, update: (prev: SlotValues) => SlotValues) {
@@ -840,6 +860,7 @@ export default function App() {
                 onSlotChildrenChange={handleSlotChildrenChange}
                 onReset={handleReset}
                 onRandomize={handleRandomize}
+                onEffectChange={composing ? undefined : handleEffectChange}
               />
             ) : (
               <div className={styles.noSelection}>

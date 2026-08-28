@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ComponentManifest, ControlValue, PlaygroundValues } from '../lib/types'
 import { pixelateSubtree, restorePixelArt, type Applied } from '../lib/pixelate'
+import { applyEffects, restoreEffects, hasEffects, type AppliedEffects } from '../lib/effects'
 import PreviewBoundary from './PreviewBoundary'
 import ComponentRender, { type EventReporter } from './ComponentRender'
 import styles from './PreviewStage.module.css'
@@ -96,6 +97,24 @@ export default function PreviewStage({
       appliedRef.current = []
     }
   }, [pixel, manifest.name, values, theme])
+
+  // Component-level effects (shadow / highlight / gradient) applied to the
+  // rendered root — the first element the boundary renders. Runs after the pixel
+  // effect so, in pixel mode, the overlay is a child of the already-clipped root
+  // and the shadow follows the stepped silhouette. `pixel` is a dep so it
+  // re-applies when the root's clip/overlay structure changes underneath it.
+  const fxRef = useRef<AppliedEffects | null>(null)
+  useLayoutEffect(() => {
+    restoreEffects(fxRef.current)
+    fxRef.current = null
+    const root = canvasRef.current?.firstElementChild
+    if (!(root instanceof HTMLElement) || !values.effects || !hasEffects(values.effects)) return
+    fxRef.current = applyEffects(root, values.effects)
+    return () => {
+      restoreEffects(fxRef.current)
+      fxRef.current = null
+    }
+  }, [values, manifest.name, theme, pixel])
 
   return (
     <section className={styles.wrapper} aria-label="Preview">

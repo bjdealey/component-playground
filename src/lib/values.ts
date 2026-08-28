@@ -1,4 +1,5 @@
 import { getManifest } from './registry'
+import { effectDefaults } from './effects'
 import type {
   ComponentManifest,
   PlaygroundValues,
@@ -43,6 +44,7 @@ export function defaultValues(manifest: ComponentManifest): PlaygroundValues {
     props: propDefaults(manifest),
     children: manifest.children?.default ?? '',
     slots: slotDefaults(manifest),
+    effects: effectDefaults(),
   }
 }
 

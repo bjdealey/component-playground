@@ -192,4 +192,10 @@ export interface PlaygroundValues {
   children: string
   /** Keyed by slot name. Slot components are configured one level deep. */
   slots: Record<string, SlotValues>
+  /**
+   * Component-level preview effects (shadow / highlight / gradient), applied to
+   * the rendered root rather than passed as props — see `lib/effects.ts`.
+   * Optional so compose blocks and slots, which don't offer them, stay simple.
+   */
+  effects?: PropValues
 }

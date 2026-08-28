@@ -247,6 +247,7 @@ export function pixelateSubtree(root: HTMLElement, pixelSize: number): Applied[]
   for (const el of all) {
     if (!(el instanceof HTMLElement)) continue // skips SVG internals etc.
     if (el.hasAttribute('data-pxl-overlay')) continue // our own border ring
+    if (el.hasAttribute('data-fx-overlay')) continue // the effects overlay (lib/effects)
     const w = el.offsetWidth
     const h = el.offsetHeight
     if (!w || !h) continue

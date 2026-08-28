@@ -5,6 +5,7 @@ import type {
   PlaygroundValues,
 } from '../lib/types'
 import { getManifest } from '../lib/registry'
+import { EFFECT_CONTROLS } from '../lib/effects'
 import ControlRenderer from './controls/ControlRenderer'
 import Field from './controls/Field'
 import TextInput from './controls/TextInput'
@@ -22,6 +23,11 @@ interface ControlsPanelProps {
   onReset: () => void
   /** Fills every setting with a fresh value — colours stay legible and CVD-safe. */
   onRandomize: () => void
+  /**
+   * Writes a component-level effect (shadow / highlight / gradient). Passed only
+   * where effects apply (the single-component stage), so compose omits the group.
+   */
+  onEffectChange?: (name: string, value: ControlValue) => void
 }
 
 interface Section {
@@ -42,6 +48,7 @@ export default function ControlsPanel({
   onSlotChildrenChange,
   onReset,
   onRandomize,
+  onEffectChange,
 }: ControlsPanelProps) {
   // Selecting a different component should land you at the top of its controls,
   // not wherever the previous component happened to be scrolled to.
@@ -86,6 +93,24 @@ export default function ControlsPanel({
         onChange={(value) => onPropChange(control.name, value)}
       />,
     )
+  }
+
+  // Component-level preview effects, offered on every component (single-component
+  // stage only). The `fx-` id prefix keeps them distinct from a real prop that
+  // happens to share a name, and their values live in `values.effects`.
+  if (onEffectChange) {
+    for (const control of EFFECT_CONTROLS) {
+      push(
+        'Effects',
+        <ControlRenderer
+          key={`fx-${control.name}`}
+          control={control}
+          value={values.effects?.[control.name] ?? control.default}
+          idPrefix="fx-"
+          onChange={(value) => onEffectChange(control.name, value)}
+        />,
+      )
+    }
   }
 
   return (
