@@ -1,0 +1,44 @@
+.grid {
+  display: grid;
+  grid-auto-flow: dense;
+  max-width: 100%;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  border-style: solid;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  overflow: hidden;
+}
+
+button.tile {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+button.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.title {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.body {
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tile:hover {
+    transform: none;
+  }
+}

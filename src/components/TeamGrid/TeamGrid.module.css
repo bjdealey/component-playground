@@ -1,0 +1,58 @@
+.grid {
+  display: grid;
+  max-width: 100%;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+}
+
+.tile[data-align='center'] {
+  align-items: center;
+  text-align: center;
+}
+
+button.tile {
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+button.tile[data-bordered]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.name {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.role {
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.tile[data-bordered]:hover {
+    transform: none;
+  }
+}
