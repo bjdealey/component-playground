@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ComponentManifest, ControlValue, PlaygroundValues } from '../lib/types'
+import { pixelateSubtree, restorePixelArt, type Applied } from '../lib/pixelate'
 import PreviewBoundary from './PreviewBoundary'
 import ComponentRender, { type EventReporter } from './ComponentRender'
 import styles from './PreviewStage.module.css'
@@ -20,6 +21,10 @@ const THEMES: StageTheme[] = ['light', 'dark']
 
 const PIXEL_KEY = 'playground:pixel'
 const PIXEL_MAX = 4
+
+// Slider notch → pixel-grid size in CSS px. Bigger = chunkier steps. Index 0 is
+// off and never read. react-pixel-ui defaults to 4; this spans fine to coarse.
+const PIXEL_PX = [0, 3, 5, 8, 12]
 
 /** A local preference, like the panes — remembered, never shared in the hash. */
 function readPixel(): number {
@@ -46,11 +51,11 @@ export default function PreviewStage({
     if (stageRef.current) stageRef.current.scrollTop = 0
   }, [manifest.name])
 
-  // Pixel-art mode: a bitmap font plus a mosaic filter laid over the *real*
-  // component, so its rounded corners (and every other edit) stay and just
-  // stair-step into pixels. The filter caches — the skin freezes the component's
-  // animations and transitions (see CSS), so it repaints once instead of every
-  // frame, which is what made it slow before. Zero is off.
+  // Pixel-art mode: a bitmap font plus per-element staircase clip-paths that
+  // step each rounded corner onto the pixel grid (see lib/pixelate, the
+  // react-pixel-ui technique). Every edit — colour, size, border, layout —
+  // survives; only the corners change, and the clips are static so nothing
+  // recomputes per frame. Zero is off.
   const [pixel, setPixel] = useState(readPixel)
   useEffect(() => {
     try {
@@ -60,12 +65,34 @@ export default function PreviewStage({
     }
   }, [pixel])
 
-  // Cell size grows with the slider. The sample dot never drops below 2px: a 1px
-  // flood renders to nothing at some sizes and would blank the preview.
-  const cell = pixel * 2 + 1
-  const dot = Math.max(2, Math.round(cell * 0.34))
-  const sample = Math.max(0, Math.round((cell - dot) / 2))
-  const grow = Math.max(1, Math.ceil(cell / 2))
+  // Re-walk the preview subtree whenever the component, its props, the theme, or
+  // the intensity change — every path that swaps DOM under us. A ResizeObserver
+  // catches width changes (splitter, 100%-wide components) since the clip
+  // polygon is sized in px. All work is one-shot per change, never per frame.
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const appliedRef = useRef<Applied[]>([])
+  useLayoutEffect(() => {
+    const root = canvasRef.current
+    if (!root || pixel === 0) return
+    const px = PIXEL_PX[pixel]
+    let raf = 0
+    const apply = () => {
+      restorePixelArt(appliedRef.current)
+      appliedRef.current = pixelateSubtree(root, px)
+    }
+    apply()
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(apply)
+    })
+    observer.observe(root)
+    return () => {
+      cancelAnimationFrame(raf)
+      observer.disconnect()
+      restorePixelArt(appliedRef.current)
+      appliedRef.current = []
+    }
+  }, [pixel, manifest.name, values, theme])
 
   return (
     <section className={styles.wrapper} aria-label="Preview">
@@ -110,7 +137,7 @@ export default function PreviewStage({
       </div>
 
       <div className={styles.stage} data-theme={theme} ref={stageRef}>
-        <div className={`${styles.canvas} ${pixel > 0 ? styles.pixelArt : ''}`}>
+        <div ref={canvasRef} className={`${styles.canvas} ${pixel > 0 ? styles.pixelArt : ''}`}>
           <PreviewBoundary resetKey={manifest.name} retryOn={values}>
             <ComponentRender
               manifest={manifest}
@@ -121,21 +148,6 @@ export default function PreviewStage({
           </PreviewBoundary>
         </div>
       </div>
-
-      {/* Rebuilt from the slider each render; the canvas above references it. */}
-      {pixel > 0 && (
-        <svg className={styles.pixelDefs} aria-hidden="true">
-          <defs>
-            <filter id="preview-pixelate" x="0" y="0" width="100%" height="100%">
-              <feFlood x={sample} y={sample} width={dot} height={dot} />
-              <feComposite width={cell} height={cell} />
-              <feTile result="a" />
-              <feComposite in="SourceGraphic" in2="a" operator="in" />
-              <feMorphology operator="dilate" radius={grow} />
-            </filter>
-          </defs>
-        </svg>
-      )}
     </section>
   )
 }

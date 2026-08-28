@@ -52,35 +52,21 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Pixel-art mode. The mosaic filter is laid over the *real* component, so its
-   rounded corners and every other edit survive — a curve stair-steps into pixels
-   rather than squaring off. The bitmap font completes the retro look. */
+/* Pixel-art mode. The corners are stepped per-element in JS (see lib/pixelate,
+   the react-pixel-ui technique): each real border-radius becomes a pixel-grid
+   staircase clip-path, so every edit survives and nothing recomputes per frame.
+   CSS only carries the other half of the look — the bitmap font, aliased hard
+   so glyph edges land on pixels too. */
 .pixelArt {
   font-family: var(--pixel-font);
   -webkit-font-smoothing: none;
-  filter: url(#preview-pixelate);
 }
 
-/* Force the bitmap font onto every element, even the monospace ones; radii are
-   left alone so the filter pixelates them in place. Crucially, freeze the
-   component's own motion: an SVG filter re-runs on every repaint, so a spinner
-   or a hover transition underneath it would recompute the whole mosaic each
-   frame — the source of the earlier slowness. Frozen, it paints once and caches. */
+/* Force the bitmap font onto every element, even the monospace ones. */
 .pixelArt *,
 .pixelArt *::before,
 .pixelArt *::after {
   font-family: var(--pixel-font) !important;
-  image-rendering: pixelated;
-  animation: none !important;
-  transition: none !important;
-}
-
-/* Holds the filter definition only; never drawn itself. */
-.pixelDefs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
 }
 
 .label {
