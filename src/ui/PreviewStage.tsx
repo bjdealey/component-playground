@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { ComponentManifest, ControlValue, PlaygroundValues } from '../lib/types'
 import PreviewBoundary from './PreviewBoundary'
 import ComponentRender, { type EventReporter } from './ComponentRender'
@@ -46,9 +47,10 @@ export default function PreviewStage({
     if (stageRef.current) stageRef.current.scrollTop = 0
   }, [manifest.name])
 
-  // Pixel-art mode: a bitmap font plus a crisp mosaic laid over the *real*
-  // component — its rounded corners and every other edit are kept, just rendered
-  // as pixels, so a curve stair-steps rather than squaring off. Zero is off.
+  // Pixel-art mode: a bitmap font, crisp rendering and a hard double-print, laid
+  // over the *real* component so its rounded corners and every other edit stay.
+  // A CSS skin, not a per-frame mosaic filter — that was slow and fought the
+  // components' rounded-corner clipping. `--px` (1–4) intensifies it. Zero is off.
   const [pixel, setPixel] = useState(readPixel)
   useEffect(() => {
     try {
@@ -57,13 +59,6 @@ export default function PreviewStage({
       // A forgotten preference is a smaller problem than a throw on every drag.
     }
   }, [pixel])
-
-  // Cell size grows with the slider. The sample dot never drops below 2px: a 1px
-  // flood renders to nothing at some sizes and would blank the preview.
-  const cell = pixel * 2 + 1
-  const dot = Math.max(2, Math.round(cell * 0.34))
-  const sample = Math.max(0, Math.round((cell - dot) / 2))
-  const grow = Math.max(1, Math.ceil(cell / 2))
 
   return (
     <section className={styles.wrapper} aria-label="Preview">
@@ -108,7 +103,10 @@ export default function PreviewStage({
       </div>
 
       <div className={styles.stage} data-theme={theme} ref={stageRef}>
-        <div className={`${styles.canvas} ${pixel > 0 ? styles.pixelArt : ''}`}>
+        <div
+          className={`${styles.canvas} ${pixel > 0 ? styles.pixelArt : ''}`}
+          style={pixel > 0 ? ({ ['--px']: pixel } as CSSProperties) : undefined}
+        >
           <PreviewBoundary resetKey={manifest.name} retryOn={values}>
             <ComponentRender
               manifest={manifest}
@@ -119,21 +117,6 @@ export default function PreviewStage({
           </PreviewBoundary>
         </div>
       </div>
-
-      {/* Rebuilt from the slider each render; the canvas above references it. */}
-      {pixel > 0 && (
-        <svg className={styles.pixelDefs} aria-hidden="true">
-          <defs>
-            <filter id="preview-pixelate" x="0" y="0" width="100%" height="100%">
-              <feFlood x={sample} y={sample} width={dot} height={dot} />
-              <feComposite width={cell} height={cell} />
-              <feTile result="a" />
-              <feComposite in="SourceGraphic" in2="a" operator="in" />
-              <feMorphology operator="dilate" radius={grow} />
-            </filter>
-          </defs>
-        </svg>
-      )}
     </section>
   )
 }
