@@ -20,11 +20,14 @@ interface PreviewStageProps {
 const THEMES: StageTheme[] = ['light', 'dark']
 
 const PIXEL_KEY = 'playground:pixel'
-const PIXEL_MAX = 4
 
-// Slider notch → pixel-grid size in CSS px. Bigger = chunkier steps. Index 0 is
-// off and never read. react-pixel-ui defaults to 4; this spans fine to coarse.
-const PIXEL_PX = [0, 3, 5, 8, 12]
+// The slider reads like a display resolution: higher = more pixels = finer. The
+// shown number (PIXEL_RES) climbs 4→64; the actual grid cell (PIXEL_PX) is its
+// inverse — 64px blocks (blockiest) down to 4px (near-original) — so dragging
+// right adds detail. res × cell ≈ 256. Index 0 is off and never read.
+const PIXEL_RES = [0, 4, 8, 16, 32, 64]
+const PIXEL_PX = [0, 64, 32, 16, 8, 4]
+const PIXEL_MAX = PIXEL_PX.length - 1
 
 /** A local preference, like the panes — remembered, never shared in the hash. */
 function readPixel(): number {
@@ -100,7 +103,7 @@ export default function PreviewStage({
         <span className={styles.label}>Preview</span>
 
         <div className={styles.tools}>
-          <label className={styles.pixelate} title="Pixel-art mode — drag to intensify">
+          <label className={styles.pixelate} title="Pixel-art resolution — higher is finer">
             <svg className={styles.pixelIcon} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <rect x="3" y="3" width="7.5" height="7.5" rx="1" />
               <rect x="13.5" y="3" width="7.5" height="7.5" rx="1" />
@@ -114,10 +117,10 @@ export default function PreviewStage({
               max={PIXEL_MAX}
               step={1}
               value={pixel}
-              aria-label="Pixel-art intensity"
+              aria-label="Pixel-art resolution"
               onChange={(event) => setPixel(Number(event.target.value))}
             />
-            <span className={styles.pixelValue}>{pixel === 0 ? 'Off' : pixel}</span>
+            <span className={styles.pixelValue}>{pixel === 0 ? 'Off' : PIXEL_RES[pixel]}</span>
           </label>
 
           <div className={styles.themeToggle} role="group" aria-label="Stage background">

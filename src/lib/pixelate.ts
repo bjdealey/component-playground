@@ -82,7 +82,12 @@ function traceCorner(grid: boolean[][], ps: number): Point[] {
 
 function cornerBoundary(radius: number, ps: number): Point[] {
   if (radius <= 0) return []
-  const b = traceCorner(buildCornerGrid(radius, ps), ps)
+  // When the grid is coarser than the corner itself — a 64px grid on a 44px
+  // avatar, where the radius was clamped to fit — a cell would overshoot the
+  // corner and throw points outside the element. Cap the cell to the radius so
+  // the corner degrades to one clean step instead of a glitch.
+  const cell = Math.min(ps, radius)
+  const b = traceCorner(buildCornerGrid(radius, cell), cell)
   return b.length ? b : [{ x: 0, y: 0 }]
 }
 
