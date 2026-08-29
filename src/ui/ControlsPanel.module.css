@@ -164,6 +164,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Splits the States section's preview toggles (disabled, hovered, loading) from
+   the styling of those states. A quiet rule, not a second collapsible group —
+   it's a caption inside one section, so it sits flush with the fields' 16px
+   gutter and borrows the panel-alt ground to read as a divider with a name. */
+.subhead {
+  margin: 0;
+  padding: 7px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-alt);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
 /* Slot sections read as borrowed from another component, not native props. */
 .slotGroup > .groupHeader {
   background: var(--accent-soft);
