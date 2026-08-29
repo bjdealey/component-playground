@@ -18,10 +18,11 @@ import { generatePage, generateTokens } from '../lib/compositionCodegen'
 import {
   applyThemeToValues,
   defaultTheme,
+  ownsShadow,
   withMode,
   type Theme,
 } from '../lib/theme'
-import { pageFor } from '../lib/designSystem'
+import { effectsFor, pageFor } from '../lib/designSystem'
 import { randomizeTheme, randomizeValues } from '../lib/randomize'
 import type {
   ComponentManifest,
@@ -450,11 +451,24 @@ export default function App() {
    * through it, and the compose page's background moves with it. This is what
    * makes Randomise global — one click, one design language across the app.
    */
-  function randomizeGlobalDesign(mode: StageTheme) {
-    const { theme: next, page } = randomizeTheme({ ...theme, mode })
+  function randomizeGlobalDesign(themeMode: StageTheme) {
+    const { theme: next, page, archetype } = randomizeTheme({ ...theme, mode: themeMode })
     setTheme(next)
     setComposition((prev) => ({ ...prev, page: { ...prev.page, background: page } }))
     setDesignActive(true)
+
+    // Component mode draws no theme envelope, so a design's elevation, gradient
+    // and highlight reach the preview through the per-component Effects layer.
+    // Populate it from the same archetype — only in component mode, and only for
+    // the component in front of you, since effects are per-component. Compose
+    // keeps its own shared-theme envelope, and the gallery shows no effects.
+    if (mode === 'component' && manifest) {
+      const effects = effectsFor(archetype, next.tokens, ownsShadow(manifest))
+      setValuesByName((prev) => ({
+        ...prev,
+        [activeName]: { ...(prev[activeName] ?? defaultValues(manifest)), effects },
+      }))
+    }
   }
 
   /**

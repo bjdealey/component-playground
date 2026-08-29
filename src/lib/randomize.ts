@@ -325,10 +325,13 @@ export function randomizeValues(
  * the generator sets is switched on so the result actually shows, and the other
  * variant is derived for a lossless light/dark flip.
  */
-export function randomizeTheme(theme: Theme): { theme: Theme; page: string } {
-  const { theme: generated, page } = generateDesign(theme.mode)
+export function randomizeTheme(
+  theme: Theme,
+): { theme: Theme; page: string; archetype: Archetype } {
+  const { theme: generated, page, archetype } = generateDesign(theme.mode)
   return {
     theme: { ...generated, enabled: { ...ALL_ON } },
     page,
+    archetype,
   }
 }
