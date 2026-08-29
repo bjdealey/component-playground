@@ -16,7 +16,7 @@ import {
 import { DEFAULT_SCENE, buildScene, sceneByName } from '../lib/scenes'
 import { generatePage, generateTokens } from '../lib/compositionCodegen'
 import { defaultTheme, type Theme } from '../lib/theme'
-import { randomizeValues } from '../lib/randomize'
+import { randomizeComponent, randomizeValues, rebakeForMode } from '../lib/randomize'
 import type {
   ComponentManifest,
   ControlValue,
@@ -105,6 +105,23 @@ export default function App() {
   })
 
   const [stageTheme, setStageTheme] = useState<StageTheme>('light')
+
+  // The design system behind a component's *randomised* look, kept per component
+  // so a light/dark flip re-derives the other variant (identity intact, colours
+  // adapted) instead of leaving one mode's colours on the other's ground. A
+  // manual edit clears it — you have taken the wheel, and the flip stops steering.
+  const [randomThemeByName, setRandomThemeByName] = useState<
+    Record<string, Theme>
+  >({})
+
+  function forgetRandomTheme(name: string) {
+    setRandomThemeByName((prev) => {
+      if (!(name in prev)) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
+  }
 
   /* ---------------- compose mode ---------------- */
 
@@ -204,6 +221,29 @@ export default function App() {
   useEffect(() => {
     setEvents([])
   }, [activeName, mode])
+
+  // Light/dark on a randomised component: re-derive its stored design in the new
+  // variant so the colours adapt rather than leaving one mode's palette on the
+  // other's ground. Identity — corners, spacing, type, the chosen variant,
+  // effect levels — is preserved; only colour and contrast move. Gated on the
+  // stored design's own mode, so it fires both on a stage flip and on selecting
+  // a component last randomised under the other variant, and is a no-op once the
+  // two agree (which is also why re-baking can't loop).
+  useEffect(() => {
+    if (mode !== 'component' || !manifest) return
+    const design = randomThemeByName[activeName]
+    if (!design || design.mode === stageTheme) return
+
+    const current = valuesByName[activeName] ?? defaultValues(manifest)
+    const { values: next, theme: flipped } = rebakeForMode(
+      manifest,
+      current,
+      design,
+      stageTheme,
+    )
+    setValuesByName((prev) => ({ ...prev, [activeName]: next }))
+    setRandomThemeByName((prev) => ({ ...prev, [activeName]: flipped }))
+  }, [stageTheme, mode, activeName, manifest, randomThemeByName, valuesByName])
 
   // Mirror the live state into the hash so a reload or a shared link restores
   // it. Which state that is depends on the mode, so the two routes never fight
@@ -338,6 +378,9 @@ export default function App() {
     }
 
     if (!manifest) return
+    // A hand edit means the randomised design is no longer wholly the machine's,
+    // so stop re-baking it on a light/dark flip.
+    forgetRandomTheme(activeName)
     setValuesByName((prev) => ({
       ...prev,
       [activeName]: update(prev[activeName] ?? defaultValues(manifest)),
@@ -401,6 +444,7 @@ export default function App() {
     }
 
     if (!manifest) return
+    forgetRandomTheme(manifest.name)
     setValuesByName((prev) => ({
       ...prev,
       [manifest.name]: defaultValues(manifest),
@@ -424,10 +468,13 @@ export default function App() {
     }
 
     if (!manifest || !values) return
-    setValuesByName((prev) => ({
-      ...prev,
-      [manifest.name]: randomizeValues(manifest, values, stageTheme),
-    }))
+    const { values: next, theme: design } = randomizeComponent(
+      manifest,
+      values,
+      stageTheme,
+    )
+    setValuesByName((prev) => ({ ...prev, [manifest.name]: next }))
+    setRandomThemeByName((prev) => ({ ...prev, [manifest.name]: design }))
   }
 
   /** A binding firing on the canvas writes back to that block, not the selection. */

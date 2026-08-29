@@ -5,6 +5,7 @@ import type {
   PlaygroundValues,
 } from '../lib/types'
 import { getManifest } from '../lib/registry'
+import { ownsShadow } from '../lib/theme'
 import { EFFECT_CONTROLS } from '../lib/effects'
 import ControlRenderer from './controls/ControlRenderer'
 import Field from './controls/Field'
@@ -98,8 +99,23 @@ export default function ControlsPanel({
   // Component-level preview effects, offered on every component (single-component
   // stage only). The `fx-` id prefix keeps them distinct from a real prop that
   // happens to share a name, and their values live in `values.effects`.
+  //
+  // Two controls are conditional, so the group is never a flat list of settings
+  // that don't apply: a component with its own `shadow` prop hides the effect
+  // shadow (it would only stack a second one), and the gradient's colour and
+  // angle appear only once there is a gradient to point.
   if (onEffectChange) {
+    const hideShadow = ownsShadow(manifest)
+    const gradientOn = Number(values.effects?.gradient ?? 0) > 0
+
     for (const control of EFFECT_CONTROLS) {
+      if (control.name === 'shadow' && hideShadow) continue
+      if (
+        (control.name === 'gradientColor' || control.name === 'gradientAngle') &&
+        !gradientOn
+      ) {
+        continue
+      }
       push(
         'Effects',
         <ControlRenderer

@@ -175,6 +175,22 @@ export function lightnessOf(color: string): number {
 }
 
 /**
+ * A hex color from HSL — hue in degrees [0, 360), saturation and lightness in
+ * [0, 1]. The randomiser builds accents this way so a design direction can dial
+ * hue, vividness and lightness independently rather than picking from a fixed list.
+ */
+export function hsl(h: number, s: number, l: number): string {
+  const hue = ((h % 360) + 360) % 360
+  return toHex(
+    fromHsl({
+      h: hue / 360,
+      s: Math.min(1, Math.max(0, s)),
+      l: Math.min(1, Math.max(0, l)),
+    }),
+  )
+}
+
+/**
  * Whichever of the two foregrounds actually measures better on `background`.
  *
  * `readableOn` is the one to reach for normally — its threshold is tuned by eye,

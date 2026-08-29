@@ -689,10 +689,21 @@ export interface SurfaceEffects {
  * shadow behind a Divider or a Spinner is a smudge on the page rather than
  * elevation — the theme would be adding noise and calling it a setting.
  */
-function drawsSurface(manifest: ComponentManifest): boolean {
+export function drawsSurface(manifest: ComponentManifest): boolean {
   return manifest.props.some(
     (control) => control.kind === 'color' && SURFACE_PROPS.has(control.name),
   )
+}
+
+/**
+ * Whether the component carries its own elevation prop.
+ *
+ * The randomiser and the controls panel both need to know: a component that
+ * already has a `shadow` prop is elevated through it, so the component-level
+ * Effects shadow would only stack a second one at the same height.
+ */
+export function ownsShadow(manifest: ComponentManifest): boolean {
+  return manifest.props.some((control) => roleOf(control, manifest.name) === 'shadow')
 }
 
 /** The corner radius a block has ended up with, theme and local edits folded in. */
@@ -1244,7 +1255,7 @@ export function withMode(
  * Presets.
  * ------------------------------------------------------------------ */
 
-const ALL_ON: Record<ToggleToken, boolean> = {
+export const ALL_ON: Record<ToggleToken, boolean> = {
   accent: true,
   surface: true,
   text: true,

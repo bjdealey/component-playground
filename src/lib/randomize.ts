@@ -1,50 +1,60 @@
 import type {
   ComponentManifest,
   Control,
-  ControlValue,
   PlaygroundValues,
   PropValues,
   SlotValues,
 } from './types'
 import { getManifest } from './registry'
-import { deriveColors, roleOf, TOKEN_RANGES } from './theme'
-import type { Theme, ThemeColors, ThemeTokens } from './theme'
-import { atLightness, bestOn, contrast, lightnessOf, mix, parseHex } from './color'
+import {
+  ALL_ON,
+  applyThemeToValues,
+  drawsSurface,
+  ownsShadow,
+  roleOf,
+} from './theme'
+import type { Theme, ThemeColors, ThemeMode } from './theme'
+import { parseHex } from './color'
+import { effectDefaults } from './effects'
+import {
+  generateDesign,
+  pageFor,
+  SHADOW_MAX,
+  toContrast,
+  type Archetype,
+} from './designSystem'
 
 /**
- * Randomising a component's settings — and its colours in a way that stays
- * legible and colour-blind-safe.
+ * Randomising a component — as a coherent design system, not a pile of CSS.
  *
- * Numbers, booleans and selects get a fresh valid value; text, textarea and
- * event props keep what they had (content and handlers are not decoration). The
- * colours are the interesting part: rather than throwing random hex at each
- * prop, this builds one coherent palette for the current light/dark stage and
- * maps it onto the props by the *same roles* the shared theme uses — so a `text`
- * prop stays a legible foreground and an `accent` prop stays the brand colour.
+ * The generator in `designSystem.ts` picks one design direction and draws a
+ * whole `Theme` from it. That theme is then folded onto the component through
+ * the *same* `applyTheme` machinery compose mode uses, so the colours, the
+ * corners, the spacing and the type all agree, contrast is enforced, and a
+ * light/dark flip is lossless — none of which per-property randomness could give.
+ *
+ * Three things the theme does not decide are added on top, and only these:
+ *   1. a *stylistic* pass over the few appearance props that carry design
+ *      character but map to no theme role — `variant`, `uppercase`, letter
+ *      spacing, hover brightness;
+ *   2. a colour-blind-safe ramp for props that hold a *list* of colours (chart
+ *      series, avatar rings);
+ *   3. component-level effects (shadow / highlight / gradient), tinted from the
+ *      generated accent so they belong to the palette.
+ *
+ * Everything else is deliberately left alone. Content, handlers, layout width,
+ * and — the point of the rewrite — *state*: `disabled`, `hovered`, `open`,
+ * `invalid` and their kin are behaviour, not decoration, and randomising them
+ * was the old code previewing a broken component and calling it a style.
  */
 
-export type StageMode = 'light' | 'dark'
+export type StageMode = ThemeMode
 
 /**
- * Accent bases that stay distinct under the common colour-vision deficiencies
- * (deuteranopia, protanopia, tritanopia) — the Okabe–Ito set minus the pale
- * yellow that can't carry white text, plus two in the same spirit. Picking the
- * accent from here makes the brand colour colour-blind-safe by construction, and
- * one safe accent against neutral chrome can never form a confusable pair.
+ * A qualitative ramp for list props (chart series, avatar rings) — every
+ * adjacent pair stays separable under the common colour-vision deficiencies, so
+ * a randomised palette never hides a category behind a confusable neighbour.
  */
-const CVD_ACCENTS = [
-  '#0072b2', // blue
-  '#d55e00', // vermillion
-  '#009e73', // bluish green
-  '#cc79a7', // reddish purple
-  '#e69f00', // orange
-  '#56b4e9', // sky blue
-  '#7c3aed', // violet
-  '#0f766e', // teal
-]
-
-/** A qualitative ramp for list props (chart series, avatar rings) — every pair
- *  is separable under CVD, so a randomised palette never hides a category. */
 const CVD_RAMP = [
   '#0072b2',
   '#e69f00',
@@ -56,104 +66,61 @@ const CVD_RAMP = [
   '#0f766e',
 ]
 
-/** Dimensions are the canvas, not the style — leave them where they are so a
- *  randomise restyles the component in place instead of teleporting it. */
-const KEEP = new Set(['width', 'height'])
+/** Variant/tone values that mean success or failure — never repainted as style. */
+const STATUS_VALUES = new Set([
+  'danger',
+  'success',
+  'warning',
+  'error',
+  'info',
+  'destructive',
+  'positive',
+  'negative',
+  'critical',
+])
 
-interface Palette {
-  accent: string
-  onAccent: string
-  accentSoft: string
-  surface: string
-  surfaceAlt: string
-  track: string
-  text: string
-  textMuted: string
-  border: string
-}
+/** Variant values that fill a shape with the accent rather than staying quiet. */
+const FILLED_VALUES = new Set([
+  'primary',
+  'solid',
+  'filled',
+  'default',
+  'fill',
+  'contained',
+])
 
-function pick<T>(list: T[]): T {
+/* ------------------------------------------------------------------ *
+ * Small random helpers.
+ * ------------------------------------------------------------------ */
+
+function pick<T>(list: readonly T[]): T {
   return list[Math.floor(Math.random() * list.length)]
 }
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value))
+function chance(p: number): boolean {
+  return Math.random() < p
 }
 
-/** Slide a foreground's lightness (hue kept) until it clears `min` contrast. */
-function toContrast(fg: string, bg: string, min: number): string {
-  if (contrast(fg, bg) >= min) return fg
-  // Away from the surface: darker on a light ground, lighter on a dark one.
-  const direction = lightnessOf(bg) > 0.5 ? -1 : 1
-  const from = lightnessOf(fg)
-  let best = fg
-  for (let i = 1; i <= 26; i += 1) {
-    best = atLightness(fg, clamp01(from + direction * i * 0.03))
-    if (contrast(best, bg) >= min) break
-  }
-  return best
+function randRange([min, max]: [number, number]): number {
+  return min + Math.random() * (max - min)
 }
 
-/**
- * One coherent palette for the stage. Neutrals are near-white/near-dark, warmed
- * a few percent toward the accent so the scheme reads as designed rather than
- * assembled, then held to WCAG AA: body foregrounds at 4.5:1, the accent at the
- * 3:1 large-element floor, both measured against the surface they sit on.
- */
-export function randomPalette(mode: StageMode): Palette {
-  const light = mode === 'light'
-  const accentBase = pick(CVD_ACCENTS)
-
-  const surfaceBase = light ? '#ffffff' : '#161719'
-  const textBase = light ? '#141518' : '#f4f5f7'
-  const mutedBase = light ? '#5f6672' : '#9aa1ab'
-  const borderBase = light ? '#e2e5ea' : '#33353d'
-  const tint = light ? 0.03 : 0.05
-
-  const surface = mix(accentBase, surfaceBase, tint * 0.6)
-  const accent = toContrast(accentBase, surface, 3)
-  const text = toContrast(mix(accentBase, textBase, tint), surface, 7)
-  const textMuted = toContrast(mix(accentBase, mutedBase, tint * 2), surface, 4.5)
-  const border = mix(accentBase, borderBase, tint)
-
-  return {
-    accent,
-    onAccent: bestOn(accent),
-    accentSoft: mix(accent, surface, 0.14),
-    surface,
-    surfaceAlt: mix(text, surface, 0.06),
-    track: mix(text, surface, 0.22),
-    text,
-    textMuted,
-    border,
-  }
+function clampIndex(value: number, length: number): number {
+  return Math.min(length - 1, Math.max(0, Math.round(value)))
 }
 
-/** The palette colour for a theme role, or null for roles that aren't colours. */
-function colorForRole(role: string, palette: Palette): string | null {
-  switch (role) {
-    case 'accent':
-      return palette.accent
-    case 'accentSoft':
-      return palette.accentSoft
-    case 'onAccent':
-      return palette.onAccent
-    case 'surface':
-      return palette.surface
-    case 'surfaceAlt':
-      return palette.surfaceAlt
-    case 'track':
-      return palette.track
-    case 'text':
-      return palette.text
-    case 'textMuted':
-      return palette.textMuted
-    case 'border':
-      return palette.border
-    default:
-      return null
-  }
+/** Keep a number inside its control's declared range, snapped to its step. */
+function clampNumber(control: Extract<Control, { kind: 'number' }>, value: number): number {
+  const lo = control.min ?? Number.NEGATIVE_INFINITY
+  const hi = control.max ?? Number.POSITIVE_INFINITY
+  const step = control.step && control.step > 0 ? control.step : 1
+  const snapped = Math.round(value / step) * step
+  return Math.round(Math.min(hi, Math.max(lo, snapped)) * 100) / 100
 }
+
+/* ------------------------------------------------------------------ *
+ * Colour-list props (chart palettes, ring sets).
+ * ------------------------------------------------------------------ */
 
 function listColors(value: string): string[] {
   return value
@@ -162,185 +129,340 @@ function listColors(value: string): string[] {
     .filter((part) => part.length > 0)
 }
 
-/** A text prop that is really a list of colours — a chart palette or ring set. */
 function isColorList(value: string): boolean {
   const parts = listColors(value)
   return parts.length >= 2 && parts.every((part) => parseHex(part) !== null)
 }
 
-function shuffledRamp(count: number, palette: Palette): string {
+function shuffledRamp(count: number, surface: string): string {
   const start = Math.floor(Math.random() * CVD_RAMP.length)
   const out: string[] = []
   for (let i = 0; i < count; i += 1) {
     // Keep each series colour visible on the surface it charts against.
-    out.push(toContrast(CVD_RAMP[(start + i) % CVD_RAMP.length], palette.surface, 3))
+    out.push(toContrast(CVD_RAMP[(start + i) % CVD_RAMP.length], surface, 3))
   }
   return out.join(', ')
 }
 
-function randomNumber(control: Extract<Control, { kind: 'number' }>): number {
-  const min = control.min ?? 0
-  const fallbackMax = typeof control.default === 'number' ? control.default * 2 : 1
-  const max = control.max ?? Math.max(min + 1, fallbackMax)
-  const step = control.step && control.step > 0 ? control.step : 1
-
-  // Triangular (average of two uniforms) leans toward the middle of the range,
-  // so results favour reasonable values over the ragged extremes.
-  const t = (Math.random() + Math.random()) / 2
-  const snapped = Math.round((min + (max - min) * t) / step) * step
-  const bounded = Math.min(max, Math.max(min, snapped))
-  // One decimal at most — sizes carry halves, spacing and radius stay integral.
-  return Math.round(bounded * 10) / 10
-}
-
-function randomValue(
-  control: Control,
-  current: ControlValue,
-  componentName: string,
-  palette: Palette,
-): ControlValue {
-  switch (control.kind) {
-    case 'number':
-      return KEEP.has(control.name) ? current : randomNumber(control)
-    case 'boolean':
-      return Math.random() < 0.5
-    case 'select':
-      return control.options.length > 0 ? pick(control.options) : current
-    case 'color': {
-      // `''` is the manifest's "my variant decides" sentinel — leave it, the same
-      // way the theme does, so a danger button doesn't turn into the brand colour.
-      if (control.default === '') return current
-      const role = roleOf(control, componentName)
-      return (role && colorForRole(role, palette)) ?? current
-    }
-    case 'text':
-    case 'textarea':
-      return typeof current === 'string' && isColorList(current)
-        ? shuffledRamp(listColors(current).length, palette)
-        : current
-    default:
-      // Event props are handlers, not style.
-      return current
-  }
-}
-
-function randomizeProps(
-  controls: Control[],
-  props: PropValues,
-  componentName: string,
-  palette: Palette,
-): PropValues {
-  const out: PropValues = { ...props }
+function rampLists(controls: Control[], props: PropValues, surface: string): void {
   for (const control of controls) {
-    out[control.name] = randomValue(
-      control,
-      props[control.name] ?? control.default,
-      componentName,
-      palette,
-    )
+    if (control.kind !== 'text' && control.kind !== 'textarea') continue
+    const value = props[control.name]
+    if (typeof value === 'string' && isColorList(value)) {
+      props[control.name] = shuffledRamp(listColors(value).length, surface)
+    }
   }
-  return out
+}
+
+/* ------------------------------------------------------------------ *
+ * The base — appearance reset, everything else preserved.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Reset every *appearance* prop to its manifest default, keeping content, state
+ * and layout as they are.
+ *
+ * Resetting first is what makes randomise idempotent: `applyTheme` scales
+ * padding and type as *multipliers* on whatever is live, so theming an
+ * already-themed value would compound a little more on every click until the
+ * component drifted off the page. Multiplying the manifest default instead
+ * lands in the same place every time. A prop the theme has an opinion about is
+ * an appearance prop, so "has a role" is exactly the line to reset on.
+ */
+function resetRoled(manifest: ComponentManifest, values: PlaygroundValues): PlaygroundValues {
+  const reset = (target: ComponentManifest, props: PropValues): PropValues => {
+    const out: PropValues = {}
+    for (const control of target.props) {
+      out[control.name] =
+        roleOf(control, target.name) !== null
+          ? control.default
+          : props[control.name] ?? control.default
+    }
+    return out
+  }
+
+  const slots: Record<string, SlotValues> = {}
+  for (const [name, slot] of Object.entries(values.slots)) {
+    const definition = manifest.slots?.find((entry) => entry.name === name)
+    const target = definition ? getManifest(definition.component) : undefined
+    slots[name] = target
+      ? { props: reset(target, slot.props), children: slot.children }
+      : slot
+  }
+
+  return {
+    props: reset(manifest, values.props),
+    children: values.children,
+    slots,
+    effects: values.effects,
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * The stylistic pass — appearance props with no theme role.
+ * ------------------------------------------------------------------ */
+
+function pickVariant(options: string[], archetype: Archetype): string | undefined {
+  const safe = options.filter((option) => !STATUS_VALUES.has(option.toLowerCase()))
+  if (safe.length === 0) return undefined
+
+  const filled = safe.filter((option) => FILLED_VALUES.has(option.toLowerCase()))
+  const quiet = safe.filter((option) => !FILLED_VALUES.has(option.toLowerCase()))
+
+  if (filled.length > 0 && chance(archetype.variantFilled)) return pick(filled)
+  return pick(quiet.length > 0 ? quiet : safe)
+}
+
+function letterSpacingFor(archetype: Archetype, uppercase: boolean): number {
+  // Uppercase wants tracking; without it the direction's own small range applies.
+  return uppercase ? randRange([0.4, 1.0]) : randRange(archetype.letterSpacing)
+}
+
+/** Below 1 darkens (right for a light ground), above 1 lightens (right for dark). */
+function hoverBrightnessFor(mode: ThemeMode): number {
+  return mode === 'light' ? randRange([0.9, 0.96]) : randRange([1.04, 1.1])
 }
 
 /**
- * A fresh random configuration for one component, colours and all.
+ * Choose `variant` / `tone` — *before* the theme is folded in.
  *
- * `mode` is the stage's light/dark, so the palette is legible against the
- * background you're actually previewing on. Slots share the one palette, the way
- * a real page shares a theme, so a card and the button inside it agree.
+ * The order is load-bearing: `applyTheme` paints a variant's colours through
+ * `VARIANT_ROLES` (primary fills with the accent, ghost only inks the label), so
+ * the variant has to be decided first or a freshly-chosen ghost keeps the solid
+ * fill the old primary left behind.
+ */
+function chooseVariants(controls: Control[], props: PropValues, archetype: Archetype): void {
+  for (const control of controls) {
+    if (control.kind !== 'select') continue
+    if (control.name === 'variant') {
+      const next = pickVariant(control.options, archetype)
+      if (next !== undefined) props.variant = next
+    } else if (control.name === 'tone') {
+      const safe = control.options.filter((o) => !STATUS_VALUES.has(o.toLowerCase()))
+      if (safe.length > 0) props.tone = pick(safe)
+    }
+  }
+}
+
+/** Type and hover styling — safe to run after theming, none of it is a colour role. */
+function styleType(
+  controls: Control[],
+  props: PropValues,
+  archetype: Archetype,
+  mode: ThemeMode,
+): void {
+  let uppercase = props.uppercase === true
+  for (const control of controls) {
+    if (control.kind === 'boolean' && control.name === 'uppercase') {
+      uppercase = chance(archetype.uppercaseProb)
+      props.uppercase = uppercase
+    }
+  }
+
+  // After uppercase is decided, since tracking depends on it.
+  for (const control of controls) {
+    if (control.kind !== 'number') continue
+    if (control.name === 'letterSpacing') {
+      props.letterSpacing = clampNumber(control, letterSpacingFor(archetype, uppercase))
+    } else if (control.name === 'hoverBrightness') {
+      props.hoverBrightness = clampNumber(control, hoverBrightnessFor(mode))
+    }
+  }
+}
+
+/** Just the hover direction, for a light/dark re-bake that keeps everything else. */
+function adjustHover(controls: Control[], props: PropValues, mode: ThemeMode): void {
+  for (const control of controls) {
+    if (control.kind === 'number' && control.name === 'hoverBrightness') {
+      props.hoverBrightness = clampNumber(control, mode === 'light' ? 0.93 : 1.07)
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Effects.
+ * ------------------------------------------------------------------ */
+
+/** Effect scale (0–5) for each elevation step, or 0 where the component owns one. */
+const SHADOW_TO_EFFECT = [0, 2, 3, 5] as const
+
+/**
+ * Component-level effects, coherent with the direction.
+ *
+ * Only for components that draw a surface for an effect to sit on — a wash
+ * behind a Divider or a Spinner is noise. Shadow defers to a component's own
+ * elevation prop where it has one, so the two never stack. Strengths stay
+ * conservative so text over the gradient or the highlight keeps its contrast.
+ */
+function randomEffects(
+  archetype: Archetype,
+  theme: Theme,
+  manifest: ComponentManifest,
+): PropValues {
+  const base = effectDefaults()
+  if (!drawsSurface(manifest)) return base
+
+  const shadow = ownsShadow(manifest)
+    ? 0
+    : SHADOW_TO_EFFECT[clampIndex(theme.tokens.shadow, SHADOW_MAX + 1)]
+  const highlight = chance(archetype.highlightProb) ? Math.round(randRange([8, 24])) : 0
+  const gradient = theme.tokens.gradient > 0 ? Math.round(theme.tokens.gradient * 55) : 0
+
+  return {
+    shadow,
+    highlight,
+    gradient,
+    gradientColor: theme.tokens.accent,
+    gradientAngle: theme.tokens.gradientAngle,
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Baking a design onto a component.
+ * ------------------------------------------------------------------ */
+
+function bake(
+  manifest: ComponentManifest,
+  values: PlaygroundValues,
+  theme: Theme,
+  archetype: Archetype,
+  mode: ThemeMode,
+): PlaygroundValues {
+  const base = resetRoled(manifest, values)
+
+  // Variants first, so the theme paints the colours of the variant we chose.
+  chooseVariants(manifest.props, base.props, archetype)
+  for (const [name, slot] of Object.entries(base.slots)) {
+    const definition = manifest.slots?.find((entry) => entry.name === name)
+    const target = definition ? getManifest(definition.component) : undefined
+    if (target) chooseVariants(target.props, slot.props, archetype)
+  }
+
+  const themed = applyThemeToValues(manifest, base, theme).values
+
+  styleType(manifest.props, themed.props, archetype, mode)
+  rampLists(manifest.props, themed.props, theme.tokens.surface)
+
+  for (const [name, slot] of Object.entries(themed.slots)) {
+    const definition = manifest.slots?.find((entry) => entry.name === name)
+    const target = definition ? getManifest(definition.component) : undefined
+    if (!target) continue
+    styleType(target.props, slot.props, archetype, mode)
+    rampLists(target.props, slot.props, theme.tokens.surface)
+  }
+
+  return { ...themed, effects: randomEffects(archetype, theme, manifest) }
+}
+
+/* ------------------------------------------------------------------ *
+ * Public API.
+ * ------------------------------------------------------------------ */
+
+/**
+ * A fresh random configuration for one component, and the design system behind
+ * it. The theme is returned so the stage can flip it to the other variant on a
+ * light/dark switch (see `rebakeForMode`) rather than stranding light colours
+ * on a dark ground.
+ */
+export function randomizeComponent(
+  manifest: ComponentManifest,
+  values: PlaygroundValues,
+  mode: StageMode,
+): { values: PlaygroundValues; theme: Theme } {
+  const { theme, archetype } = generateDesign(mode)
+  return { values: bake(manifest, values, theme, archetype, mode), theme }
+}
+
+/**
+ * The values-only form, for the compose canvas where a block is randomised
+ * under the page's own theme and carries no component-level effects.
  */
 export function randomizeValues(
   manifest: ComponentManifest,
   values: PlaygroundValues,
   mode: StageMode,
 ): PlaygroundValues {
-  const palette = randomPalette(mode)
+  const { values: next } = randomizeComponent(manifest, values, mode)
+  return { ...next, effects: values.effects }
+}
 
-  const slots: Record<string, SlotValues> = { ...values.slots }
-  for (const slot of manifest.slots ?? []) {
-    const target = getManifest(slot.component)
-    const slotValues = values.slots[slot.name]
-    if (!target || !slotValues) continue
-    slots[slot.name] = {
-      props: randomizeProps(target.props, slotValues.props, target.name, palette),
-      children: slotValues.children,
-    }
+/** Swap a theme's colours to its other variant, identity intact. */
+function flipMode(theme: Theme, mode: ThemeMode): Theme {
+  if (mode === theme.mode) return theme
+  const next = theme.alternate
+  const current: ThemeColors = {
+    accent: theme.tokens.accent,
+    surface: theme.tokens.surface,
+    text: theme.tokens.text,
+    textMuted: theme.tokens.textMuted,
+    border: theme.tokens.border,
+    page: pageFor(theme.tokens.surface, theme.mode),
   }
-
   return {
-    props: randomizeProps(manifest.props, values.props, manifest.name, palette),
-    children: values.children,
-    slots,
+    ...theme,
+    mode,
+    tokens: {
+      ...theme.tokens,
+      accent: next.accent,
+      surface: next.surface,
+      text: next.text,
+      textMuted: next.textMuted,
+      border: next.border,
+    },
+    alternate: current,
   }
-}
-
-function randToken(range: { min: number; max: number; step: number }): number {
-  const steps = Math.round((range.max - range.min) / range.step)
-  const value = range.min + Math.floor(Math.random() * (steps + 1)) * range.step
-  return Math.round(value * 100) / 100
-}
-
-/** The page a themed surface sits on — a touch off the surface, per mode. */
-function pageFor(surface: string, mode: StageMode): string {
-  return mode === 'light' ? mix('#000000', surface, 0.035) : mix('#000000', surface, 0.4)
 }
 
 /**
- * A fresh random *theme* for compose mode — one click retints the whole page.
+ * Re-derive a randomised component for the other light/dark variant.
  *
- * Colours come from the same `randomPalette`, so the scheme is coherent, WCAG-
- * legible and colour-blind-safe in the current light/dark variant. Corners and
- * surface effects vary too; the type and spacing scales are left alone so nothing
- * about the layout breaks. The randomised tokens are switched on so the result
- * actually shows, and the other variant is derived for a lossless light/dark flip.
+ * The design identity is kept — corners, spacing, type, the chosen variant and
+ * effect levels all persist (they ride through `resetRoled`, which only resets
+ * what the theme drives). Only the colours, their contrast, and the hover
+ * direction adapt to the new mode, and the gradient tint follows the new accent.
+ */
+export function rebakeForMode(
+  manifest: ComponentManifest,
+  values: PlaygroundValues,
+  theme: Theme,
+  mode: StageMode,
+): { values: PlaygroundValues; theme: Theme } {
+  const flipped = flipMode(theme, mode)
+  const base = resetRoled(manifest, values)
+  const themed = applyThemeToValues(manifest, base, flipped).values
+
+  adjustHover(manifest.props, themed.props, mode)
+  rampLists(manifest.props, themed.props, flipped.tokens.surface)
+
+  for (const [name, slot] of Object.entries(themed.slots)) {
+    const definition = manifest.slots?.find((entry) => entry.name === name)
+    const target = definition ? getManifest(definition.component) : undefined
+    if (!target) continue
+    adjustHover(target.props, slot.props, mode)
+    rampLists(target.props, slot.props, flipped.tokens.surface)
+  }
+
+  const effects = {
+    ...(values.effects ?? effectDefaults()),
+    gradientColor: flipped.tokens.accent,
+  }
+
+  return { values: { ...themed, effects }, theme: flipped }
+}
+
+/**
+ * A fresh random *theme* for compose mode — one click retints, re-rounds and
+ * re-scales the whole page.
+ *
+ * The same design-direction generator drives it, so a compose theme now carries
+ * a coherent spacing and type scale, not only colours and corners. Every token
+ * the generator sets is switched on so the result actually shows, and the other
+ * variant is derived for a lossless light/dark flip.
  */
 export function randomizeTheme(theme: Theme): { theme: Theme; page: string } {
-  const p = randomPalette(theme.mode)
-
-  const tokens: ThemeTokens = {
-    ...theme.tokens,
-    accent: p.accent,
-    surface: p.surface,
-    text: p.text,
-    textMuted: p.textMuted,
-    border: p.border,
-    radius: randToken(TOKEN_RANGES.radius),
-    borderWidth: randToken(TOKEN_RANGES.borderWidth),
-    shadow: randToken(TOKEN_RANGES.shadow),
-    gradient: Math.random() < 0.45 ? 0 : randToken({ min: 0.1, max: 0.5, step: 0.05 }),
-  }
-
-  const page = pageFor(p.surface, theme.mode)
-  const colors: ThemeColors = {
-    accent: p.accent,
-    surface: p.surface,
-    text: p.text,
-    textMuted: p.textMuted,
-    border: p.border,
-    page,
-  }
-  const otherMode = theme.mode === 'light' ? 'dark' : 'light'
-
+  const { theme: generated, page } = generateDesign(theme.mode)
   return {
-    theme: {
-      ...theme,
-      tokens,
-      // Turn on the tokens we just set, so a randomise is never a no-op because a
-      // switch happened to be off. The rest keep the user's toggles.
-      enabled: {
-        ...theme.enabled,
-        accent: true,
-        surface: true,
-        text: true,
-        textMuted: true,
-        border: true,
-        radius: true,
-        borderWidth: true,
-        shadow: true,
-        gradient: true,
-      },
-      alternate: deriveColors(colors, otherMode),
-    },
+    theme: { ...generated, enabled: { ...ALL_ON } },
     page,
   }
 }
