@@ -12,6 +12,11 @@ import type { Control, PropValues } from './types'
  */
 export const EFFECT_CONTROLS: Control[] = [
   { name: 'shadow', kind: 'number', default: 0, min: 0, max: 5, step: 1, group: 'Effects' },
+  // Whole-element material: fade the component, blur it, or frost what's behind
+  // it. Opacity defaults to 100 (fully opaque, no effect); the two blurs to 0.
+  { name: 'opacity', kind: 'number', default: 100, min: 0, max: 100, step: 1, group: 'Effects' },
+  { name: 'blur', kind: 'number', default: 0, min: 0, max: 20, step: 0.5, group: 'Effects' },
+  { name: 'backdropBlur', kind: 'number', default: 0, min: 0, max: 20, step: 0.5, group: 'Effects' },
   { name: 'highlight', kind: 'number', default: 0, min: 0, max: 100, step: 1, group: 'Effects' },
   { name: 'gradient', kind: 'number', default: 0, min: 0, max: 100, step: 1, group: 'Effects' },
   { name: 'gradientColor', kind: 'color', default: '#4f46e5', group: 'Effects' },
@@ -30,7 +35,15 @@ const num = (e: PropValues, key: string, fallback = 0): number =>
 /** True when any effect is turned up from its default — the applier's on switch. */
 export function hasEffects(e: PropValues | undefined): boolean {
   if (!e) return false
-  return num(e, 'shadow') > 0 || num(e, 'highlight') > 0 || num(e, 'gradient') > 0
+  return (
+    num(e, 'shadow') > 0 ||
+    num(e, 'highlight') > 0 ||
+    num(e, 'gradient') > 0 ||
+    // Opacity is stored 0–100 and only bites below 100; the blurs default to 0.
+    num(e, 'opacity', 100) < 100 ||
+    num(e, 'blur') > 0 ||
+    num(e, 'backdropBlur') > 0
+  )
 }
 
 /** #rgb / #rrggbb → rgba() at the given alpha. Falls back to a neutral tint. */
@@ -55,6 +68,8 @@ export interface AppliedEffects {
   root: HTMLElement
   prevFilter: string
   prevPosition: string
+  prevOpacity: string
+  prevBackdrop: string
   overlay: HTMLElement | null
 }
 
@@ -68,6 +83,9 @@ export function applyEffects(root: HTMLElement, e: PropValues): AppliedEffects {
   const shadow = num(e, 'shadow')
   const highlight = num(e, 'highlight')
   const gradient = num(e, 'gradient')
+  const opacity = num(e, 'opacity', 100)
+  const blur = num(e, 'blur')
+  const backdropBlur = num(e, 'backdropBlur')
   const color =
     typeof e.gradientColor === 'string' && e.gradientColor ? e.gradientColor : '#4f46e5'
   const angle = num(e, 'gradientAngle', 135)
@@ -76,14 +94,34 @@ export function applyEffects(root: HTMLElement, e: PropValues): AppliedEffects {
     root,
     prevFilter: root.style.filter,
     prevPosition: root.style.position,
+    prevOpacity: root.style.opacity,
+    prevBackdrop: root.style.backdropFilter,
     overlay: null,
   }
 
-  // Shadow — compose with any existing inline filter rather than drop it.
-  const filter = shadowFilter(shadow)
-  if (filter) {
+  // Filter chain — blur the element, then cast its elevation shadow, composed
+  // with any inline filter the component already had rather than dropping it.
+  // Blur first, so the shadow reads as soft rather than a sharp edge on a fuzzy
+  // shape.
+  const chain: string[] = []
+  if (blur > 0) chain.push(`blur(${blur}px)`)
+  const shadowChain = shadowFilter(shadow)
+  if (shadowChain) chain.push(shadowChain)
+  if (chain.length) {
     const prev = rec.prevFilter && rec.prevFilter !== 'none' ? `${rec.prevFilter} ` : ''
-    root.style.filter = prev + filter
+    root.style.filter = prev + chain.join(' ')
+  }
+
+  // Fade the whole component. Only below 100, so an opaque default never writes
+  // an inline opacity the component would then be stuck with.
+  if (opacity < 100) root.style.opacity = String(Math.round(opacity) / 100)
+
+  // Frost what's behind the component. Needs some translucency to show — pair it
+  // with opacity, or a component whose own background is see-through.
+  if (backdropBlur > 0) {
+    const value = `blur(${backdropBlur}px)`
+    root.style.backdropFilter = value
+    root.style.setProperty('-webkit-backdrop-filter', value)
   }
 
   // Highlight + gradient — one overlay over the component. A gradient tint plus
@@ -112,10 +150,13 @@ export function applyEffects(root: HTMLElement, e: PropValues): AppliedEffects {
   return rec
 }
 
-/** Undo applyEffects: drop the overlay and put the root's filter/position back. */
+/** Undo applyEffects: drop the overlay and put every touched style back. */
 export function restoreEffects(rec: AppliedEffects | null): void {
   if (!rec) return
   rec.overlay?.remove()
   rec.root.style.filter = rec.prevFilter
   rec.root.style.position = rec.prevPosition
+  rec.root.style.opacity = rec.prevOpacity
+  rec.root.style.backdropFilter = rec.prevBackdrop
+  rec.root.style.removeProperty('-webkit-backdrop-filter')
 }
