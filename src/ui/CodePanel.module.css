@@ -93,7 +93,7 @@
   border: 1px solid var(--accent);
   border-radius: 6px;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -102,14 +102,17 @@
 }
 
 .copy:hover {
-  background: #4338ca;
-  border-color: #4338ca;
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
 }
 
+/* Green is a status confirmation, the same in both modes — and dark enough that
+   its label stays white rather than following --on-accent. */
 .copied,
 .copied:hover {
   background: #15803d;
   border-color: #15803d;
+  color: #ffffff;
 }
 
 .code {
