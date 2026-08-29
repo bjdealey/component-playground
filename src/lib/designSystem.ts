@@ -7,6 +7,7 @@ import {
 } from './color'
 import { ALL_ON, deriveColors, SHADOW_STEPS } from './theme'
 import type { Theme, ThemeColors, ThemeMode, ThemeTokens } from './theme'
+import type { PropValues } from './types'
 
 /**
  * The design-direction generator.
@@ -414,3 +415,42 @@ export function generateDesign(mode: ThemeMode): GeneratedDesign {
 
 /** Index-safe access to the elevation ramp — the shadow token bounds it. */
 export const SHADOW_MAX = SHADOW_STEPS.length - 1
+
+/* ------------------------------------------------------------------ *
+ * Preview effects.
+ * ------------------------------------------------------------------ */
+
+/**
+ * The component-level preview effects a design implies — the values the Effects
+ * section is populated with when you randomise a single component.
+ *
+ * Only the effects that are a *design decision* are rolled: a top highlight
+ * (the archetypes already carry `highlightProb` for exactly this), an accent
+ * gradient at the same strength the theme chose, and elevation. Opacity and the
+ * two blurs are pointedly left at their defaults — a randomly translucent or
+ * blurred component reads as broken rather than designed, so those stay a manual
+ * choice.
+ *
+ * Elevation is drawn here only where the component has no `shadow` prop of its
+ * own; where it does, the theme already drove that prop and a second shadow on
+ * the root would stack a heavier one at the same height.
+ */
+export function effectsFor(
+  a: Archetype,
+  tokens: ThemeTokens,
+  ownsShadow: boolean,
+): PropValues {
+  return {
+    // 0–3 elevation index → the Effects layer's 0–5 range.
+    shadow: ownsShadow ? 0 : Math.min(5, Math.round(tokens.shadow * 1.6)),
+    opacity: 100,
+    blur: 0,
+    backdropBlur: 0,
+    highlight: chance(a.highlightProb) ? Math.round(rand(16, 34)) : 0,
+    // The theme's gradient is 0–1; the Effects layer's is 0–100. Reusing it keeps
+    // a single-component preview at the same gradient strength compose draws.
+    gradient: Math.round(tokens.gradient * 100),
+    gradientColor: tokens.accent,
+    gradientAngle: tokens.gradientAngle,
+  }
+}
