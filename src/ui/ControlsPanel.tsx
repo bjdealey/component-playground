@@ -7,6 +7,7 @@ import type {
 import { getManifest } from '../lib/registry'
 import { ownsShadow } from '../lib/theme'
 import { EFFECT_CONTROLS } from '../lib/effects'
+import { resolveSection, type PanelSection } from '../lib/controlSections'
 import ControlRenderer from './controls/ControlRenderer'
 import Field from './controls/Field'
 import TextInput from './controls/TextInput'
@@ -31,9 +32,21 @@ interface ControlsPanelProps {
   onEffectChange?: (name: string, value: ControlValue) => void
 }
 
-interface Section {
-  name: string
-  nodes: ReactNode[]
+interface SectionItem {
+  key: string
+  node: ReactNode
+  /**
+   * Only consulted in the States section: a boolean here is a live preview-state
+   * toggle (disabled, loading, hovered) rather than the styling of a state, so
+   * the panel can keep the two apart.
+   */
+  toggle: boolean
+}
+
+interface Section extends PanelSection {
+  /** Canonical order key; unmapped groups fall to the end. */
+  rank: number
+  items: SectionItem[]
 }
 
 /** Ungrouped controls collect under this sentinel and render without a header. */
@@ -58,22 +71,30 @@ export default function ControlsPanel({
     if (bodyRef.current) bodyRef.current.scrollTop = 0
   }, [manifest.name])
 
-  const sections: Section[] = []
-  const indexOf = new Map<string, number>()
+  // Controls with no group render headerless at the top; everything else is
+  // filed into a canonical section, so the panel reads in the same order on
+  // every component no matter what order its manifest declared its props in.
+  const ungrouped: SectionItem[] = []
+  const byId = new Map<string, Section>()
 
-  function push(group: string, node: ReactNode) {
-    let index = indexOf.get(group)
-    if (index === undefined) {
-      index = sections.length
-      indexOf.set(group, index)
-      sections.push({ name: group, nodes: [] })
+  function push(group: string, key: string, node: ReactNode, toggle = false) {
+    if (group === UNGROUPED) {
+      ungrouped.push({ key, node, toggle })
+      return
     }
-    sections[index].nodes.push(node)
+    const section = resolveSection(group)
+    let bucket = byId.get(section.id)
+    if (!bucket) {
+      bucket = { ...section, items: [] }
+      byId.set(section.id, bucket)
+    }
+    bucket.items.push({ key, node, toggle })
   }
 
   if (manifest.children) {
     push(
       manifest.children.group ?? UNGROUPED,
+      'children',
       <Field key="children" name="children" value={values.children}>
         <TextInput
           name="children"
@@ -85,14 +106,24 @@ export default function ControlsPanel({
   }
 
   for (const control of manifest.props) {
+    const group = control.group ?? UNGROUPED
+    // In States, a boolean is the state itself (previewed) and a colour or number
+    // is that state's styling — the split that stops `hovered` reading as a
+    // sibling of hoverBackground.
+    const isStateToggle =
+      group !== UNGROUPED &&
+      control.kind === 'boolean' &&
+      resolveSection(group).id === 'states'
     push(
-      control.group ?? UNGROUPED,
+      group,
+      control.name,
       <ControlRenderer
         key={control.name}
         control={control}
         value={values.props[control.name] ?? control.default}
         onChange={(value) => onPropChange(control.name, value)}
       />,
+      isStateToggle,
     )
   }
 
@@ -118,6 +149,7 @@ export default function ControlsPanel({
       }
       push(
         'Effects',
+        `fx-${control.name}`,
         <ControlRenderer
           key={`fx-${control.name}`}
           control={control}
@@ -128,6 +160,13 @@ export default function ControlsPanel({
       )
     }
   }
+
+  // Canonical order; an unmapped group (rank at the end) sorts by name so the
+  // trailing custom sections are at least stable.
+  const sections = [...byId.values()].sort(
+    (a, b) => a.rank - b.rank || a.label.localeCompare(b.label),
+  )
+  const hasControls = ungrouped.length > 0 || sections.length > 0
 
   return (
     <aside className={styles.panel} aria-label="Controls">
@@ -158,26 +197,28 @@ export default function ControlsPanel({
       {note && <p className={styles.note}>{note}</p>}
 
       <div className={styles.body} ref={bodyRef}>
-        {sections.length === 0 && (manifest.slots ?? []).length === 0 && (
+        {!hasControls && (manifest.slots ?? []).length === 0 && (
           <p className={styles.empty}>
             <code>{manifest.name}</code> declares no props in its manifest.
           </p>
         )}
 
-        {sections.map((section) =>
-          section.name === UNGROUPED ? (
-            <div key={UNGROUPED}>{section.nodes}</div>
-          ) : (
-            <details key={section.name} className={styles.group} open>
-              <summary className={styles.groupHeader}>
-                <span className={styles.chevron} aria-hidden="true" />
-                <span className={styles.groupName}>{section.name}</span>
-                <span className={styles.groupCount}>{section.nodes.length}</span>
-              </summary>
-              {section.nodes}
-            </details>
-          ),
+        {ungrouped.length > 0 && (
+          <div key={UNGROUPED}>{ungrouped.map((item) => item.node)}</div>
         )}
+
+        {sections.map((section) => (
+          <details key={section.id} className={styles.group} open>
+            <summary className={styles.groupHeader}>
+              <span className={styles.chevron} aria-hidden="true" />
+              <span className={styles.groupName}>{section.label}</span>
+              <span className={styles.groupCount}>{section.items.length}</span>
+            </summary>
+            {section.id === 'states'
+              ? renderStates(section.items)
+              : section.items.map((item) => item.node)}
+          </details>
+        ))}
 
         {/*
           Slot sections come from the target component's own manifest, so an
@@ -234,5 +275,30 @@ export default function ControlsPanel({
         })}
       </div>
     </aside>
+  )
+}
+
+/**
+ * The States section, with its live preview toggles kept apart from the styling
+ * of those states.
+ *
+ * The two were being read as one flat list, so `hovered` — which just previews
+ * the component in its hover state — sat next to `hoverBackground` as if it were
+ * another colour to set. Splitting them (toggles first, then a quiet "State
+ * styling" rule) says what each half is for: the top group *sets* a state, the
+ * bottom group *styles* one.
+ */
+function renderStates(items: SectionItem[]): ReactNode {
+  const toggles = items.filter((item) => item.toggle)
+  const styling = items.filter((item) => !item.toggle)
+
+  return (
+    <>
+      {toggles.map((item) => item.node)}
+      {toggles.length > 0 && styling.length > 0 && (
+        <p className={styles.subhead}>State styling</p>
+      )}
+      {styling.map((item) => item.node)}
+    </>
   )
 }
