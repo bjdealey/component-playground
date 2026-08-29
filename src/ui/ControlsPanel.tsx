@@ -131,13 +131,15 @@ export default function ControlsPanel({
   // stage only). The `fx-` id prefix keeps them distinct from a real prop that
   // happens to share a name, and their values live in `values.effects`.
   //
-  // Two controls are conditional, so the group is never a flat list of settings
-  // that don't apply: a component with its own `shadow` prop hides the effect
-  // shadow (it would only stack a second one), and the gradient's colour and
-  // angle appear only once there is a gradient to point.
+  // Three conditionals, so the group is never a flat list of settings that don't
+  // apply: a component with its own `shadow` prop hides the effect shadow (it
+  // would only stack a second one); the gradient's colour and angle appear only
+  // once there is a gradient to point; and the pixel shading style (hard vs
+  // dither) appears only once pixel mode is on for it to govern.
   if (onEffectChange) {
     const hideShadow = ownsShadow(manifest)
     const gradientOn = Number(values.effects?.gradient ?? 0) > 0
+    const pixelOn = Number(values.effects?.pixel ?? 0) > 0
 
     for (const control of EFFECT_CONTROLS) {
       if (control.name === 'shadow' && hideShadow) continue
@@ -147,6 +149,7 @@ export default function ControlsPanel({
       ) {
         continue
       }
+      if (control.name === 'pixelShading' && !pixelOn) continue
       push(
         'Effects',
         `fx-${control.name}`,

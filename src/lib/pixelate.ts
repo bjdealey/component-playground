@@ -14,6 +14,23 @@
 // library's other two tricks, both needing a canvas/parser) are intentionally
 // left out — the corners are the headline.
 
+/**
+ * The resolution slider, shared with the Effects layer so a component's pixel
+ * level and its pixelated shadow/gradient agree on one grid.
+ *
+ * The shown number reads like a display resolution — higher = more pixels =
+ * finer (4→64) — while the actual grid cell is its inverse (64px blocks down to
+ * 4px), so dragging right adds detail. Index 0 is off.
+ */
+export const PIXEL_RES = [0, 4, 8, 16, 32, 64] as const
+export const PIXEL_PX = [0, 64, 32, 16, 8, 4] as const
+export const PIXEL_MAX = PIXEL_PX.length - 1
+
+/** The grid cell size in px for a resolution level, clamped into range. */
+export function pixelCell(level: number): number {
+  return PIXEL_PX[Math.min(PIXEL_MAX, Math.max(0, Math.round(level)))]
+}
+
 interface Point {
   x: number
   y: number
