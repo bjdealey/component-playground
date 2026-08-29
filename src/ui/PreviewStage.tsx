@@ -11,14 +11,12 @@ export type StageTheme = 'light' | 'dark'
 interface PreviewStageProps {
   manifest: ComponentManifest
   values: PlaygroundValues
+  /** Light/dark for the stage backdrop — driven by the site-wide header toggle. */
   theme: StageTheme
-  onThemeChange: (theme: StageTheme) => void
   onPropChange: (name: string, value: ControlValue) => void
   /** Called whenever a handler the playground supplied actually fires. */
   onEvent: EventReporter
 }
-
-const THEMES: StageTheme[] = ['light', 'dark']
 
 const PIXEL_KEY = 'playground:pixel'
 
@@ -44,7 +42,6 @@ export default function PreviewStage({
   manifest,
   values,
   theme,
-  onThemeChange,
   onPropChange,
   onEvent,
 }: PreviewStageProps) {
@@ -144,20 +141,6 @@ export default function PreviewStage({
             />
             <span className={styles.pixelValue}>{pixel === 0 ? 'Off' : PIXEL_RES[pixel]}</span>
           </label>
-
-          <div className={styles.themeToggle} role="group" aria-label="Stage background">
-            {THEMES.map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={`${styles.themeButton} ${theme === option ? styles.themeActive : ''}`}
-                aria-pressed={theme === option}
-                onClick={() => onThemeChange(option)}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 

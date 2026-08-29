@@ -8,7 +8,6 @@ import {
   defaultTheme,
   surfaceEffects,
   themeFromPreset,
-  withMode,
 } from '../lib/theme'
 import type { Composition } from '../lib/composition'
 import { getManifest } from '../lib/registry'
@@ -333,27 +332,9 @@ export default function ThemePanel({
           <span className={styles.title}>Shared theme</span>
         </label>
 
-        {/* Every preset has both variants now — the one it was authored in
-            verbatim, the other derived by moving lightness while hue and
-            saturation stay put. Warm stays amber in the dark. */}
-        <div className={styles.modes} role="group" aria-label="Variant">
-          {(['light', 'dark'] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              className={`${styles.mode} ${theme.mode === mode ? styles.modeActive : ''}`}
-              aria-pressed={theme.mode === mode}
-              title={`${mode === 'light' ? 'Light' : 'Dark'} variant of this theme`}
-              onClick={() => {
-                const next = withMode(theme, mode, composition.page.background)
-                onChange(next.theme)
-                onPresetPage(next.page)
-              }}
-            >
-              {mode === 'light' ? '☀' : '☾'}
-            </button>
-          ))}
-        </div>
+        {/* Light/dark is site-wide now (the header toggle), so the panel no
+            longer carries its own variant switch — both presets and the tokens
+            below still render in whichever variant that toggle has chosen. */}
 
         <button
           type="button"

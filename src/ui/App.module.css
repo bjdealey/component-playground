@@ -131,19 +131,51 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-.tagline {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-faint);
-  /* Fixed basis so the mode switch stays put when the text length changes. */
+/* The right cluster: the jump-to-a-component finder (shown only while the list
+   is hidden) and the site-wide light/dark toggle. A fixed basis, like the old
+   status line, so the mode switch stays centred whether or not the search shows. */
+.headerRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
   flex: 0 1 320px;
-  text-align: right;
 }
 
-.tagline code {
-  font-family: var(--mono);
-  font-size: 11.5px;
+.themeToggle {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.themeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  padding: 4px 7px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
   color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.themeButton:hover {
+  color: var(--text);
+}
+
+.themeActive,
+.themeActive:hover {
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* The columns are set inline, since the last one is draggable. Compose drops
@@ -323,11 +355,6 @@
   .themeSlot {
     height: auto !important;
     max-height: 32vh;
-  }
-
-  /* The status line has nowhere to sit beside the mode switch. */
-  .tagline {
-    display: none;
   }
 }
 

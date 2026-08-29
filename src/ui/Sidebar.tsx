@@ -16,8 +16,6 @@ interface SidebarProps {
    * two keypresses in one tick would otherwise both act on a stale selection.
    */
   onStep: (delta: number, pool: string[]) => void
-  /** Folded to an icon rail — desktop only; the owner gates it on width. */
-  railMode: boolean
 }
 
 function controlCount(manifest: ComponentManifest): number {
@@ -43,7 +41,6 @@ export default function Sidebar({
   selected,
   onSelect,
   onStep,
-  railMode,
 }: SidebarProps) {
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
@@ -161,46 +158,6 @@ export default function Sidebar({
     onStep(
       event.key === 'ArrowDown' ? 1 : -1,
       sections.flatMap((section) => section.entries.map((entry) => entry.name)),
-    )
-  }
-
-  // Collapsed: a slim icon rail. Names move to tooltips, sections to their
-  // category glyph, and the whole thing hands its width back to the preview.
-  if (railMode) {
-    return (
-      <nav
-        className={`${styles.sidebar} ${styles.rail} ${className ?? ''}`}
-        aria-label="Components"
-      >
-        {sections.map((section) => (
-          <div key={section.name} className={styles.railSection}>
-            <span
-              className={styles.railCategory}
-              title={section.name}
-              aria-hidden="true"
-            >
-              <Glyph name={categoryIconKey(section.name)} className={styles.railCatIcon} />
-            </span>
-            {section.entries.map((manifest) => {
-              const isActive = manifest.name === selected
-              return (
-                <button
-                  key={manifest.name}
-                  type="button"
-                  ref={isActive ? activeRef : undefined}
-                  className={`${styles.railItem} ${isActive ? styles.railActive : ''}`}
-                  title={manifest.name}
-                  aria-label={manifest.name}
-                  aria-current={isActive ? 'true' : undefined}
-                  onClick={() => onSelect(manifest.name)}
-                >
-                  <Glyph name={componentIconKey(manifest)} className={styles.railIcon} />
-                </button>
-              )
-            })}
-          </div>
-        ))}
-      </nav>
     )
   }
 

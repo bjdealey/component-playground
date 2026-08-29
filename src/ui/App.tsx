@@ -32,6 +32,7 @@ import type {
 import { SPLITTER, usePane } from '../lib/panes'
 import Splitter from './Splitter'
 import Sidebar from './Sidebar'
+import HeaderSearch from './HeaderSearch'
 import Gallery from './Gallery'
 import PreviewStage, { type StageTheme } from './PreviewStage'
 import ComposeStage from './ComposeStage'
@@ -58,19 +59,6 @@ const MODES: { id: Mode; label: string; hint: string }[] = [
 
 /** The three layout regions become tabs on a narrow screen. */
 type MobileTab = 'list' | 'view' | 'edit'
-
-/** Width of the collapsed component rail — wide enough for a 20px icon + hit area. */
-const RAIL_WIDTH = 54
-
-const NAV_COLLAPSED_KEY = 'playground:nav:collapsed'
-
-function readNavCollapsed(): boolean {
-  try {
-    return window.localStorage.getItem(NAV_COLLAPSED_KEY) === '1'
-  } catch {
-    return false
-  }
-}
 
 /** Tracks a media query, so the layout can switch to tabs below the breakpoint. */
 function useMediaQuery(query: string): boolean {
@@ -110,7 +98,12 @@ export default function App() {
     return seeded
   })
 
-  const [stageTheme, setStageTheme] = useState<StageTheme>('light')
+  // Light/dark is one site-wide choice now, driven from the header. It starts
+  // matching whatever variant a restored compose theme is in, so a dark link
+  // opens dark everywhere rather than dark canvas on a light stage.
+  const [stageTheme, setStageTheme] = useState<StageTheme>(
+    () => fromComposeUrl?.theme?.mode ?? 'light',
+  )
 
   // Whether the global design system is applied to the single-component preview
   // and the gallery. Randomise turns it on; it is off at first so a fresh
@@ -139,23 +132,12 @@ export default function App() {
   const isMobile = useMediaQuery('(max-width: 899px)')
   const [mobileTab, setMobileTab] = useState<MobileTab>('view')
 
-  // The phone's chrome overlays rather than docking: the component list slides
-  // in as a drawer from the header hamburger, and the controls rise as a bottom
-  // sheet over the preview. Both are dismissible, neither is a persistent pane.
+  // The component list is a slide-in drawer from the header hamburger on every
+  // width now — fully hidden by default so gallery and component get their full
+  // room, opened over the content when you reach for it. The controls still rise
+  // as a bottom sheet on a phone. Both are dismissible, neither is a docked pane.
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [mobileControlsOpen, setMobileControlsOpen] = useState(false)
-
-  // The component list can fold to an icon rail to give the preview its width
-  // back. Only on the wide layout — on a phone the list is its own full tab.
-  const [navCollapsed, setNavCollapsed] = useState(readNavCollapsed)
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(NAV_COLLAPSED_KEY, navCollapsed ? '1' : '0')
-    } catch {
-      // A rail that forgets its state across reloads is not worth throwing over.
-    }
-  }, [navCollapsed])
-  const railMode = navCollapsed && !isMobile
 
   // On a phone, drilling into a component is a fresh screen: close the list
   // drawer and the controls sheet whenever the shown component or the mode
@@ -469,6 +451,24 @@ export default function App() {
   }
 
   /**
+   * Light/dark, site-wide — one choice from the header, not a per-area toggle.
+   * The stage backdrop follows it directly; the shared theme flips to the
+   * matching variant (its colours and the page together) so compose, the gallery
+   * and the single-component preview all read as the same mode at once.
+   */
+  function handleThemeMode(next: StageTheme) {
+    setStageTheme(next)
+    if (theme.mode !== next) {
+      const flipped = withMode(theme, next, composition.page.background)
+      setTheme(flipped.theme)
+      setComposition((prev) => ({
+        ...prev,
+        page: { ...prev.page, background: flipped.page },
+      }))
+    }
+  }
+
+  /**
    * Randomise. In compose it restyles the selected block under the page theme;
    * everywhere else it generates the global design system above.
    */
@@ -671,11 +671,11 @@ export default function App() {
   const controlsOpen = isMobile && (composing ? activeTab === 'edit' : mobileControlsOpen)
   const rightHidden = !isMobile || controlsOpen ? '' : styles.paneHidden
 
+  // No docked component list any more — it overlays as a drawer — so component
+  // and compose share the same three regions: preview/canvas, splitter, controls.
   const columns = bare
     ? 'minmax(0, 1fr)'
-    : composing
-      ? `minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
-      : `${railMode ? RAIL_WIDTH : 216}px minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
+    : `minmax(0, 1fr) ${SPLITTER}px ${rightPane.size}px`
 
   // In compose mode the controls panel follows the canvas selection, so with
   // nothing selected there is nothing to configure.
@@ -686,22 +686,14 @@ export default function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.brand}>
-          {(isMobile || mode === 'component') && (
+          {!composing && (
             <button
               type="button"
               className={styles.hamburger}
-              title={
-                isMobile
-                  ? 'Show the component list'
-                  : navCollapsed
-                    ? 'Expand the component list'
-                    : 'Collapse the component list'
-              }
-              aria-label={isMobile ? 'Open the component list' : 'Toggle the component list'}
-              aria-expanded={isMobile ? drawerOpen : !navCollapsed}
-              onClick={() =>
-                isMobile ? setDrawerOpen((o) => !o) : setNavCollapsed((v) => !v)
-              }
+              title={drawerOpen ? 'Hide the component list' : 'Show the component list'}
+              aria-label="Toggle the component list"
+              aria-expanded={drawerOpen}
+              onClick={() => setDrawerOpen((open) => !open)}
             >
               <Glyph name="hamburger" />
             </button>
@@ -733,25 +725,46 @@ export default function App() {
           ))}
         </div>
 
-        <p className={styles.tagline}>
-          {composing ? (
-            <>
-              {composition.blocks.length} component
-              {composition.blocks.length === 1 ? '' : 's'} on the page, one shared
-              theme.
-            </>
-          ) : mode === 'gallery' ? (
-            <>Every component, at a glance. Click one to open it.</>
-          ) : (
-            <>
-              Manifest-driven. Drop a folder in <code>src/components/</code> to add
-              one.
-            </>
+        <div className={styles.headerRight}>
+          {/* The list is hidden by default, so a jump-to-a-component finder sits
+              here in its place — only while the list is actually hidden. */}
+          {!isMobile && !composing && !drawerOpen && (
+            <HeaderSearch
+              manifests={manifests}
+              onSelect={(name) => {
+                setInteractive(false)
+                setMode('component')
+                setSelected(name)
+                setMobileTab('view')
+              }}
+            />
           )}
-        </p>
+
+          {/* One light/dark control for the whole site — stage, gallery, canvas. */}
+          <div className={styles.themeToggle} role="group" aria-label="Light or dark">
+            {(['light', 'dark'] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={`${styles.themeButton} ${
+                  stageTheme === option ? styles.themeActive : ''
+                }`}
+                aria-pressed={stageTheme === option}
+                title={`${option === 'light' ? 'Light' : 'Dark'} mode — site-wide`}
+                aria-label={option === 'light' ? 'Light mode' : 'Dark mode'}
+                onClick={() => handleThemeMode(option)}
+              >
+                {option === 'light' ? '☀' : '☾'}
+              </button>
+            ))}
+          </div>
+        </div>
       </header>
 
-      {isMobile && (
+      {/* The component list, hidden by default on gallery and component, opened
+          over the content as a left drawer from the header hamburger — the same
+          overlay on every width now, not only the phone. Compose has no list. */}
+      {!composing && (
         <>
           <div
             className={`${styles.scrim} ${drawerOpen ? styles.scrimShown : ''}`}
@@ -772,7 +785,6 @@ export default function App() {
                 setDrawerOpen(false)
               }}
               onStep={handleStep}
-              railMode={false}
             />
           </aside>
         </>
@@ -783,23 +795,13 @@ export default function App() {
           manifests={manifests}
           onOpen={openComponent}
           design={designActive ? theme : null}
-          onRandomize={() => randomizeGlobalDesign(theme.mode)}
+          onRandomize={() => randomizeGlobalDesign(stageTheme)}
         />
       ) : manifest && values ? (
         <div
           className={styles.layout}
           style={{ gridTemplateColumns: columns }}
         >
-          {!composing && !isMobile && (
-            <Sidebar
-              manifests={manifests}
-              selected={activeName}
-              onSelect={(name) => setSelected(name)}
-              onStep={handleStep}
-              railMode={railMode}
-            />
-          )}
-
           <main className={styles.center}>
             {mobilePreview && (
               <div className={styles.mobileBar}>
@@ -854,7 +856,6 @@ export default function App() {
                 manifest={manifest}
                 values={shownValues ?? values}
                 theme={stageTheme}
-                onThemeChange={setStageTheme}
                 onPropChange={handlePropChange}
                 onEvent={handleEvent}
               />
@@ -897,7 +898,7 @@ export default function App() {
                       }))
                     }
                     composition={composition}
-                    onRandomize={() => randomizeGlobalDesign(theme.mode)}
+                    onRandomize={() => randomizeGlobalDesign(stageTheme)}
                   />
                 </div>
                 <Splitter pane={themePane} label="Theme panel height" />

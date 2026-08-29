@@ -1,0 +1,103 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 9px;
+  width: 14px;
+  height: 14px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+
+.input {
+  width: 200px;
+  height: 30px;
+  padding: 0 10px 0 28px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+.input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* The results, floating over the content below the header. Dropdown elevation
+   (a menu opening over content), matching the app's overlay vocabulary. */
+.list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 45;
+  width: 240px;
+  max-height: 320px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
+}
+
+.item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Keyboard highlight and hover share the accent-soft selection idiom. */
+.itemActive {
+  background: var(--accent-soft);
+}
+
+.name {
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemActive .name {
+  color: var(--accent);
+}
+
+.cat {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Touch: a taller field, easier to hit. */
+@media (pointer: coarse) {
+  .input {
+    height: 36px;
+  }
+}
