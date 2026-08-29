@@ -177,8 +177,8 @@
   overflow: hidden;
   border-radius: var(--radius) var(--radius) 0 0;
   border-bottom: 1px solid var(--border);
-  background-color: var(--stage-light);
-  background-image: radial-gradient(circle, #e6e8ec 1px, transparent 1px);
+  background-color: var(--canvas);
+  background-image: radial-gradient(circle, var(--canvas-dot) 1px, transparent 1px);
   background-size: 16px 16px;
 }
 

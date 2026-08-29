@@ -133,7 +133,7 @@
 }
 
 .groupHeader:hover {
-  background: #f3f4f6;
+  background: var(--panel-alt);
 }
 
 .chevron {
@@ -170,7 +170,7 @@
 }
 
 .slotGroup > .groupHeader:hover {
-  background: #e6ebfe;
+  background: var(--accent-soft-hover);
 }
 
 .slotGroup .groupName {

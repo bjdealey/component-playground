@@ -199,6 +199,13 @@ export default function App() {
     setEvents([])
   }, [activeName, mode])
 
+  // Paint the whole workbench chrome in the site-wide light/dark: the toggle sets
+  // data-theme on the root, and global.css swaps the chrome palette under it. The
+  // stage and the gallery-tile canvases follow through their own vars.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', stageTheme)
+  }, [stageTheme])
+
   // The global design system, in the mode this surface is viewed at — the
   // stage's light/dark for the single-component preview. Null when no design is
   // active, so component mode shows plain manifest values. `withMode` derives the

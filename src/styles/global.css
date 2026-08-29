@@ -13,16 +13,55 @@
   --text-faint: #6b7280;
   --accent: #4f46e5;
   --accent-soft: #eef2ff;
+  /* Readable ink on an accent fill; the deeper accent for a hover/pressed fill;
+     the accent-soft ground pressed one step. */
+  --on-accent: #ffffff;
+  --accent-strong: #4338ca;
+  --accent-soft-hover: #e6ebfe;
   --radius: 8px;
 
   --stage-light: #ffffff;
   --stage-dark: #17181c;
+
+  /* The preview canvas behind gallery tiles — follows the site light/dark. */
+  --canvas: #ffffff;
+  --canvas-dot: #e6e8ec;
 
   --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   /* Self-hosted (offline) — drives the preview's Pixel-art mode. */
   --pixel-font: 'Pixelify Sans', ui-monospace, monospace;
+}
+
+/* Dark workbench chrome. The site-wide light/dark toggle sets data-theme on the
+   root; the neutral grayscale palette inverts here — near-black page, dark
+   surfaces, light ink — while the one indigo accent lifts so it stays legible on
+   dark. Only the chrome and the tile canvas follow; the previewed components
+   keep their own colours (their theme is a separate, deliberate layer). The two
+   values kept steady are the stage backdrops, which the preview toggles itself,
+   and the fonts. */
+:root[data-theme='dark'] {
+  --bg: #0e0f12;
+  --panel: #1b1d22;
+  /* A step *above* the surface here, so hovers lighten (as dark UIs expect) and
+     the mode-switch active — on the darker --panel — reads pressed into its track. */
+  --panel-alt: #24262c;
+  --border: #2b2e35;
+  --border-strong: #3b3f47;
+  --text: #eceef2;
+  --text-muted: #9aa1ab;
+  --text-faint: #9aa1ab;
+  --accent: #818cf8;
+  /* The selected/active ground and the focus halo — a dark indigo wash that
+     still carries the accent as a foreground at AA. */
+  --accent-soft: #262a45;
+  --accent-strong: #9aa2fa;
+  /* Dark accent fills carry dark ink; white would read at ~2.8:1 on the lifted indigo. */
+  --on-accent: #17191c;
+  --accent-soft-hover: #2e3352;
+  --canvas: #17181c;
+  --canvas-dot: #2b2d34;
 }
 
 /* Pixelify Sans (OFL) — bundled, never fetched at runtime. See
