@@ -48,6 +48,9 @@ export default function PreviewStage({
   onPropChange,
   onEvent,
 }: PreviewStageProps) {
+  // `values` already has the global design folded in (App passes the resolved
+  // values), so this stage just renders and instruments what it is given.
+
   // Same reasoning as the controls panel: a new component starts at the top of
   // the stage rather than inheriting the previous one's scroll offset.
   const stageRef = useRef<HTMLDivElement>(null)

@@ -12,7 +12,6 @@ import {
 } from '../lib/theme'
 import type { Composition } from '../lib/composition'
 import { getManifest } from '../lib/registry'
-import { randomizeTheme } from '../lib/randomize'
 import styles from './ThemePanel.module.css'
 
 /**
@@ -65,6 +64,12 @@ interface ThemePanelProps {
   onPresetPage: (background: string) => void
   /** Measured against, to report how much the theme is actually driving. */
   composition: Composition
+  /**
+   * Randomise the whole design system. Lives in App because the result is
+   * global now — it retints the compose page here and the single-component
+   * preview and gallery at the same time.
+   */
+  onRandomize: () => void
 }
 
 type ColorToken = Extract<
@@ -204,6 +209,7 @@ export default function ThemePanel({
   onChange,
   onPresetPage,
   composition,
+  onRandomize,
 }: ThemePanelProps) {
   /**
    * What each token governs on this page.
@@ -352,13 +358,9 @@ export default function ThemePanel({
         <button
           type="button"
           className={styles.randomize}
-          title="Randomise the theme — colours stay legible and colour-blind-safe"
-          aria-label="Randomise the theme"
-          onClick={() => {
-            const next = randomizeTheme(theme)
-            onChange(next.theme)
-            onPresetPage(next.page)
-          }}
+          title="Randomise the design — retints the whole app, colours stay legible and colour-blind-safe"
+          aria-label="Randomise the design"
+          onClick={onRandomize}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M16 3h5v5" />

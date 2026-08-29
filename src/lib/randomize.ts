@@ -6,23 +6,10 @@ import type {
   SlotValues,
 } from './types'
 import { getManifest } from './registry'
-import {
-  ALL_ON,
-  applyThemeToValues,
-  drawsSurface,
-  ownsShadow,
-  roleOf,
-} from './theme'
-import type { Theme, ThemeColors, ThemeMode } from './theme'
+import { ALL_ON, applyThemeToValues, roleOf } from './theme'
+import type { Theme, ThemeMode } from './theme'
 import { parseHex } from './color'
-import { effectDefaults } from './effects'
-import {
-  generateDesign,
-  pageFor,
-  SHADOW_MAX,
-  toContrast,
-  type Archetype,
-} from './designSystem'
+import { generateDesign, toContrast, type Archetype } from './designSystem'
 
 /**
  * Randomising a component — as a coherent design system, not a pile of CSS.
@@ -103,10 +90,6 @@ function chance(p: number): boolean {
 
 function randRange([min, max]: [number, number]): number {
   return min + Math.random() * (max - min)
-}
-
-function clampIndex(value: number, length: number): number {
-  return Math.min(length - 1, Math.max(0, Math.round(value)))
 }
 
 /** Keep a number inside its control's declared range, snapped to its step. */
@@ -270,53 +253,6 @@ function styleType(
   }
 }
 
-/** Just the hover direction, for a light/dark re-bake that keeps everything else. */
-function adjustHover(controls: Control[], props: PropValues, mode: ThemeMode): void {
-  for (const control of controls) {
-    if (control.kind === 'number' && control.name === 'hoverBrightness') {
-      props.hoverBrightness = clampNumber(control, mode === 'light' ? 0.93 : 1.07)
-    }
-  }
-}
-
-/* ------------------------------------------------------------------ *
- * Effects.
- * ------------------------------------------------------------------ */
-
-/** Effect scale (0–5) for each elevation step, or 0 where the component owns one. */
-const SHADOW_TO_EFFECT = [0, 2, 3, 5] as const
-
-/**
- * Component-level effects, coherent with the direction.
- *
- * Only for components that draw a surface for an effect to sit on — a wash
- * behind a Divider or a Spinner is noise. Shadow defers to a component's own
- * elevation prop where it has one, so the two never stack. Strengths stay
- * conservative so text over the gradient or the highlight keeps its contrast.
- */
-function randomEffects(
-  archetype: Archetype,
-  theme: Theme,
-  manifest: ComponentManifest,
-): PropValues {
-  const base = effectDefaults()
-  if (!drawsSurface(manifest)) return base
-
-  const shadow = ownsShadow(manifest)
-    ? 0
-    : SHADOW_TO_EFFECT[clampIndex(theme.tokens.shadow, SHADOW_MAX + 1)]
-  const highlight = chance(archetype.highlightProb) ? Math.round(randRange([8, 24])) : 0
-  const gradient = theme.tokens.gradient > 0 ? Math.round(theme.tokens.gradient * 55) : 0
-
-  return {
-    shadow,
-    highlight,
-    gradient,
-    gradientColor: theme.tokens.accent,
-    gradientAngle: theme.tokens.gradientAngle,
-  }
-}
-
 /* ------------------------------------------------------------------ *
  * Baking a design onto a component.
  * ------------------------------------------------------------------ */
@@ -351,7 +287,10 @@ function bake(
     rampLists(target.props, slot.props, theme.tokens.surface)
   }
 
-  return { ...themed, effects: randomEffects(archetype, theme, manifest) }
+  // Effects (shadow / highlight / gradient) are not part of a block bake: the
+  // compose canvas draws elevation and the gradient wash from the shared theme's
+  // own tokens (see `surfaceEffects`), so a per-block copy would only double them.
+  return themed
 }
 
 /* ------------------------------------------------------------------ *
@@ -359,95 +298,22 @@ function bake(
  * ------------------------------------------------------------------ */
 
 /**
- * A fresh random configuration for one component, and the design system behind
- * it. The theme is returned so the stage can flip it to the other variant on a
- * light/dark switch (see `rebakeForMode`) rather than stranding light colours
- * on a dark ground.
- */
-export function randomizeComponent(
-  manifest: ComponentManifest,
-  values: PlaygroundValues,
-  mode: StageMode,
-): { values: PlaygroundValues; theme: Theme } {
-  const { theme, archetype } = generateDesign(mode)
-  return { values: bake(manifest, values, theme, archetype, mode), theme }
-}
-
-/**
- * The values-only form, for the compose canvas where a block is randomised
- * under the page's own theme and carries no component-level effects.
+ * A fresh random configuration for one component — the full rich bake (theme
+ * plus variant, tracking, hover and effects).
+ *
+ * Used by the compose canvas to restyle a single selected block. The
+ * single-component and gallery surfaces are driven by a shared design *theme*
+ * instead (see `randomizeTheme` and App's global design), so that one click
+ * lands the same design language on everything at once rather than a different
+ * one per component.
  */
 export function randomizeValues(
   manifest: ComponentManifest,
   values: PlaygroundValues,
   mode: StageMode,
 ): PlaygroundValues {
-  const { values: next } = randomizeComponent(manifest, values, mode)
-  return { ...next, effects: values.effects }
-}
-
-/** Swap a theme's colours to its other variant, identity intact. */
-function flipMode(theme: Theme, mode: ThemeMode): Theme {
-  if (mode === theme.mode) return theme
-  const next = theme.alternate
-  const current: ThemeColors = {
-    accent: theme.tokens.accent,
-    surface: theme.tokens.surface,
-    text: theme.tokens.text,
-    textMuted: theme.tokens.textMuted,
-    border: theme.tokens.border,
-    page: pageFor(theme.tokens.surface, theme.mode),
-  }
-  return {
-    ...theme,
-    mode,
-    tokens: {
-      ...theme.tokens,
-      accent: next.accent,
-      surface: next.surface,
-      text: next.text,
-      textMuted: next.textMuted,
-      border: next.border,
-    },
-    alternate: current,
-  }
-}
-
-/**
- * Re-derive a randomised component for the other light/dark variant.
- *
- * The design identity is kept — corners, spacing, type, the chosen variant and
- * effect levels all persist (they ride through `resetRoled`, which only resets
- * what the theme drives). Only the colours, their contrast, and the hover
- * direction adapt to the new mode, and the gradient tint follows the new accent.
- */
-export function rebakeForMode(
-  manifest: ComponentManifest,
-  values: PlaygroundValues,
-  theme: Theme,
-  mode: StageMode,
-): { values: PlaygroundValues; theme: Theme } {
-  const flipped = flipMode(theme, mode)
-  const base = resetRoled(manifest, values)
-  const themed = applyThemeToValues(manifest, base, flipped).values
-
-  adjustHover(manifest.props, themed.props, mode)
-  rampLists(manifest.props, themed.props, flipped.tokens.surface)
-
-  for (const [name, slot] of Object.entries(themed.slots)) {
-    const definition = manifest.slots?.find((entry) => entry.name === name)
-    const target = definition ? getManifest(definition.component) : undefined
-    if (!target) continue
-    adjustHover(target.props, slot.props, mode)
-    rampLists(target.props, slot.props, flipped.tokens.surface)
-  }
-
-  const effects = {
-    ...(values.effects ?? effectDefaults()),
-    gradientColor: flipped.tokens.accent,
-  }
-
-  return { values: { ...themed, effects }, theme: flipped }
+  const { theme, archetype } = generateDesign(mode)
+  return bake(manifest, values, theme, archetype, mode)
 }
 
 /**
