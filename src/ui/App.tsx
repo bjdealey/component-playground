@@ -463,11 +463,23 @@ export default function App() {
     // the component in front of you, since effects are per-component. Compose
     // keeps its own shared-theme envelope, and the gallery shows no effects.
     if (mode === 'component' && manifest) {
-      const effects = effectsFor(archetype, next.tokens, ownsShadow(manifest))
-      setValuesByName((prev) => ({
-        ...prev,
-        [activeName]: { ...(prev[activeName] ?? defaultValues(manifest)), effects },
-      }))
+      setValuesByName((prev) => {
+        const current = prev[activeName] ?? defaultValues(manifest)
+        return {
+          ...prev,
+          // Merge over the current effects rather than replace them: effectsFor
+          // speaks only to the design effects (elevation, gradient, highlight),
+          // so a manual pixel-art setting survives the reroll instead of snapping
+          // back off.
+          [activeName]: {
+            ...current,
+            effects: {
+              ...(current.effects ?? effectDefaults()),
+              ...effectsFor(archetype, next.tokens, ownsShadow(manifest)),
+            },
+          },
+        }
+      })
     }
   }
 
