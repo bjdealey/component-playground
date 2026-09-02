@@ -91,6 +91,10 @@ export default function DataTable({
         bordered={bordered}
         compact={compact}
         align={align}
+        // DataTable owns row order through paging, so it opts out of Table's
+        // sortable headers and typed columns — the slice stays plain and stable.
+        sortable={false}
+        columnTypes=""
         radius={radius}
         borderWidth={borderWidth}
         background={background}
