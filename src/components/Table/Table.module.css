@@ -6,12 +6,44 @@
   overflow: hidden;
 }
 
+/*
+ * The body's own scroll container. A sticky header needs one to stick within,
+ * and `maxHeight` caps it here; with neither set this is an inert passthrough.
+ */
+.scroll {
+  overflow: auto;
+}
+
+.scroll:focus-visible {
+  outline: 2px solid var(--table-accent, #4f46e5);
+  outline-offset: -2px;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
   font-family: inherit;
   font-size: inherit;
   color: inherit;
+}
+
+/* Declared widths only bind under a fixed layout; then over-long cells clip. */
+.table.fixed {
+  table-layout: fixed;
+}
+
+.table.fixed th,
+.table.fixed td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: -0.01em;
 }
 
 .table th,
@@ -30,10 +62,31 @@
 /*
  * Every body row, striped or not, gets its fill from a custom property rather
  * than an inline style — an inline `background-color` would outrank the :hover
- * rule below and the hovered row would keep its resting fill.
+ * rule below and the hovered row would keep its resting fill. A selected row
+ * sets this same property, so it layers over the stripe and under hover.
  */
 .table tbody tr {
   background-color: var(--table-background);
+}
+
+/* Opt-in vertical rules; the adjacent-sibling selector skips the leading edge. */
+.dividers th + th,
+.dividers td + td {
+  border-left-style: solid;
+  border-left-width: var(--table-divider-w, 1px);
+  border-left-color: var(--table-divider, #e3e6ea);
+}
+
+/*
+ * A sticky header rides the scroll container. The inset shadow re-draws the
+ * bottom hairline that `border-collapse` otherwise drops once the header
+ * detaches on scroll; it overlaps the resting border, so nothing doubles.
+ */
+.sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-shadow: inset 0 calc(-1 * var(--table-divider-w, 1px)) 0 var(--table-divider, #e3e6ea);
 }
 
 .clickableRow {
@@ -45,4 +98,106 @@
 .clickableRow[data-hover] {
   background-color: var(--table-hover-background, var(--table-background));
   filter: brightness(var(--table-hover-brightness, 1));
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable:focus-visible {
+  outline: 2px solid var(--table-accent, #4f46e5);
+  outline-offset: -2px;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/*
+ * The sort caret is a drawn CSS triangle, not a glyph — it matches the chrome's
+ * chevron idiom and stays crisp at any size. Idle it is hidden, surfacing faint
+ * on hover/focus to advertise that a header sorts, and full-strength accent when
+ * that column is the active sort. Base shape points down (descending).
+ */
+.caret {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.sortable:hover .caret,
+.sortable:focus-visible .caret {
+  opacity: 0.4;
+}
+
+.caretActive {
+  opacity: 1;
+  border-top-color: var(--table-accent, #4f46e5);
+}
+
+/* Ascending flips the triangle to point up. */
+.caretActive.caretUp {
+  border-top: 0;
+  border-bottom: 5px solid var(--table-accent, #4f46e5);
+}
+
+.checkCell {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.numberCell {
+  font-variant-numeric: tabular-nums;
+}
+
+.monoCell {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.footerRow td {
+  font-weight: 600;
+}
+
+/* Coarse pointers can't hover to reveal chrome, so keep the sort affordance on
+ * and give the checkbox a larger, comfortable target. */
+@media (pointer: coarse) {
+  .sortable .caret {
+    opacity: 0.4;
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+  }
 }
